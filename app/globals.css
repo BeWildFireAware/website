@@ -1,0 +1,683 @@
+/* ================= ROOT ================= */
+
+body {
+  margin: 0;
+  font-family: sans-serif;
+  background-color: #FFFFFF;
+  color: #FFF;
+  flex-direction: column;
+}
+html {
+  height: 100%;
+  background-color: #09240f;
+}
+
+
+/* ================= LAYOUT ================= */
+
+.dashboard-container {
+  min-height: 100vh;
+  padding: 1.5rem;
+  background-color: darkgray;
+
+
+}
+
+
+/* ================= HEADINGS ================= */
+
+.dashboard-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+}
+
+.dashboard-heading {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.dashboard-subheading {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+/* ================= SECTIONS ================= */
+
+.DispatchArea-section,
+.status-section,
+.FDRA-section {
+  color: rgb(0, 0, 0);
+  margin-bottom: 3rem;
+}
+
+.record-count {
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+/* ================= CARDS ================= */
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  color: black;
+}
+
+
+.area-card {
+  background-color: #b0d7ff;
+  border: 5px solid red;
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+/* ================= STATUS ================= */
+
+.status-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  border-radius: 20px;
+  border: 4px solid red;
+  background-color: darkred;
+}
+
+
+.status-card {
+  padding: 1.25rem;
+  border-radius: 0.5rem;
+  border: 1px solid;
+}
+
+.status-success {
+  background-color: #79ffc0;
+  border-color: #00ff5e;
+}
+
+.status-error {
+  background-color: #fef2f2;
+  border-color: #fca5a5;
+}
+
+.status-text-success {
+  color: #15803d;
+  font-weight: 600;
+  font-size: large;
+}
+
+.status-text-error {
+  color: #b91c1c;
+  font-weight: 600;
+}
+
+.status-DispatchArea,
+.status-FDRA,
+.status-StationRecord {
+  font-size: larger;
+  margin-top: 0.5rem;
+  font-weight: 700;
+
+}
+
+/* ================= ERROR ================= */
+
+.error-message {
+  background-color: #e67171;
+  border: 1px solid #fca5a5;
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+.error-title {
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.error-body {
+  color: #b91c1c;
+}
+
+/* ================= UTIL ================= */
+
+p {
+  margin: 0.25rem 0;
+}
+
+/* app/globals.css - Add these custom classes */
+
+/* Dashboard Container */
+.dashboard-container {
+  min-height: 100vh;
+  background-color: white;
+  padding: 1rem;
+}
+
+@media (min-width: 768px) {
+  .dashboard-container {
+    padding: 2rem;
+  }
+}
+
+/* Typography */
+.dashboard-title {
+  font-size: 1.875rem; /* text-3xl */
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: black;
+}
+
+.dashboard-heading {
+  font-size: 1.5rem; /* text-2xl */
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: black;
+}
+
+.dashboard-subheading {
+  font-size: 1.125rem; /* text-lg */
+  font-weight: 600;
+  color: black;
+}
+
+/* Cards Grid */
+.cards-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .cards-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.area-card {
+  background-color: #f9fafb; /* gray-50 */
+  border: 1px solid #d1d5db; /* gray-300 */
+  border-radius: 0.5rem;
+  padding: 1rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+/* Table */
+.data-table {
+  min-width: 100%;
+  background-color: #f9fafb;
+  border: 1px solid #d1d5db;
+}
+
+.data-table thead {
+  background-color: #e5e7eb; /* gray-200 */
+}
+
+.data-table th {
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  text-align: left;
+  color: black;
+  font-weight: 600;
+}
+
+.data-table td {
+  padding: 0.5rem 1rem;
+  border: 1px solid #d1d5db;
+  color: black;
+}
+
+.data-table tr:hover {
+  background-color: #f3f4f6; /* gray-100 */
+}
+
+/* Status Cards */
+.status-container {
+  background-color: #f3f4f6; /* gray-100 */
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid #d1d5db;
+  margin-top: 2rem;
+}
+
+.status-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .status-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.status-card {
+  padding: 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid;
+}
+
+.status-success {
+  background-color: #d1fae5; /* green-100 */
+  border-color: #86efac; /* green-300 */
+}
+
+.status-error {
+  background-color: #fee2e2; /* red-100 */
+  border-color: #fca5a5; /* red-300 */
+}
+
+.status-text-success {
+  color: #15803d; /* green-700 */
+}
+
+.status-text-error {
+  color: #b91c1c; /* red-700 */
+}
+
+/* Summary Cards */
+.summary-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .summary-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.summary-card {
+  background-color: white;
+  padding: 1rem;
+  border-radius: 0.25rem;
+  border: 1px solid #d1d5db;
+}
+
+/* Utility Classes */
+.text-black {
+  color: black !important;
+}
+
+.bg-white {
+  background-color: white !important;
+}
+
+.bg-gray-50 {
+  background-color: #f9fafb !important;
+}
+
+.bg-gray-100 {
+  background-color: #f3f4f6 !important;
+}
+
+.border-gray-300 {
+  border-color: #d1d5db !important;
+}
+
+.rounded-lg {
+  border-radius: 0.5rem !important;
+}
+
+.p-4 {
+  padding: 1rem !important;
+}
+
+.mb-4 {
+  margin-bottom: 1rem !important;
+}
+
+.mb-6 {
+  margin-bottom: 1.5rem !important;
+}
+
+.mb-8 {
+  margin-bottom: 2rem !important;
+}
+
+.mt-8 {
+  margin-top: 2rem !important;
+}
+
+.overflow-x-auto {
+  overflow-x: auto !important;
+}
+
+/* Error/Warning States */
+.error-message {
+  background-color: #fef2f2;
+  border: 1px solid #fca5a5;
+  border-radius: 0.25rem;
+  padding: 1rem;
+}
+
+.error-title {
+  font-weight: 700;
+  color: #991b1b;
+}
+
+.error-body {
+  color: #b91c1c;
+}
+
+.warning-message {
+  background-color: #fffbeb;
+  border: 1px solid #fcd34d;
+  border-radius: 0.25rem;
+  padding: 1rem;
+}
+
+.warning-text {
+  color: #92400e;
+}
+
+/* NAV BAR+ Page*/
+
+.page-container {
+  margin: 0px;
+  border-radius: 0px;
+  padding: 25px;
+  min-height: calc(100vh-120px);
+  background-color: #0F2311;
+  flex: 1;
+}
+
+.nav-Bar-Bottom {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  background-color: #0B3D12;
+  padding: 10px;
+  
+  
+  
+}
+.nav-Bar-Top {
+  display: flex;
+  justify-content: right;
+  gap: 25px;
+  background-color: #0B3D12;
+  padding:30px;
+  color:#FFFFFF;
+  text-decoration: none;
+}
+/* Add these rules to target the links */
+.nav-Bar-Top a,
+.nav-Bar-Bottom a {
+  color: #FFFFFF !important; /* Force white color */
+  text-decoration: none; /* Remove underline */
+}
+
+/* Add visited/link states */
+.nav-Bar-Top a:visited,
+.nav-Bar-Bottom a:visited,
+.nav-Bar-Top a:link,
+.nav-Bar-Bottom a:link
+{
+  color: #FFFFFF !important;
+}
+.nav-Bar-Top ul li a:active,
+.nav-Bar-Bottom a:active{
+  color: #FF6600 !important;
+  
+}
+
+.contact-info {
+  text-align: center;
+  padding: 20px;
+  background-color: #0B3D12; /* Same as page container */
+  color: white;
+  margin: 0;
+}
+
+.logo-navbar {
+  position: absolute;
+  left: 15px; /* Position from left edge */
+  top: 0.5%;
+  
+}
+
+/* homepage */
+
+.homepage-header {
+  text-align: center;
+  font-size: larger;
+  padding-top: 100px;
+  padding-bottom: 100px;
+  min-height: 300px;
+  min-width: 300px;
+  color: #fff;
+  background-color: transparent;
+  background: url('/images/backgrndphoto.webp') no-repeat center center/cover !important;
+  position: center;
+  z-index: 1;
+}
+
+
+
+/* map page */
+.map-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+}
+
+/* ================= CSV DISPLAY ================= */
+
+.csv-container {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+	gap: 20px;
+	padding: 20px;
+}
+
+.csv-card {
+	border: 1px solid #ddd;
+	border-radius: 8px;
+	padding: 16px;
+	background: white;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.csv-row {
+	margin-bottom: 10px;
+	font-size: 14px;
+	line-height: 1.5;
+}
+
+
+.csv-container,
+.csv-card,
+.csv-row {
+  color: #000;
+}
+
+/*dropdown :( */
+/* ================= DROPDOWN STYLES ================= */
+
+/* Dropdown Container */
+.dropdown-container {
+  position: relative;
+  display: inline-block;
+}
+
+/* Dropdown Trigger Button */
+.dropdown-trigger {
+  background: none;
+  border: none;
+  color: #FFFFFF !important; /* Match navbar text color */
+  font: inherit;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background-color 0.2s;
+  text-decoration: none !important;
+}
+
+/* Match the hover state of other navbar links */
+.dropdown-trigger:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Keep white color for visited/active states */
+.dropdown-trigger:visited,
+.dropdown-trigger:link,
+.dropdown-trigger:active {
+  color: #FFFFFF !important;
+}
+
+.dropdown-trigger:active {
+  color: #FF6600 !important; /* Match your active link color */
+}
+
+/* Dropdown Arrow */
+.dropdown-arrow {
+  font-size: 0.7rem;
+  transition: transform 0.2s;
+  color: #FFFFFF;
+}
+
+.dropdown-arrow.open {
+  transform: rotate(180deg);
+}
+
+/* Dropdown Menu */
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: #0B3D12; /* Match navbar background color */
+  min-width: 280px;
+  max-height: 70vh;
+  overflow-y: auto;
+  border: 1px solid #1a4720; /* Slightly lighter border */
+  border-radius: 4px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  margin-top: 0.25rem;
+}
+
+/* Scrollbar styling for dropdown */
+.dropdown-menu::-webkit-scrollbar {
+  width: 8px;
+}
+
+.dropdown-menu::-webkit-scrollbar-track {
+  background: #0a3511;
+}
+
+.dropdown-menu::-webkit-scrollbar-thumb {
+  background: #1a4720;
+  border-radius: 4px;
+}
+
+.dropdown-menu::-webkit-scrollbar-thumb:hover {
+  background: #205a28;
+}
+
+/* Dispatch Group */
+.dispatch-group {
+  border-bottom: 1px solid #1a4720;
+}
+
+.dispatch-group:last-child {
+  border-bottom: none;
+}
+
+/* Dispatch Header */
+.dispatch-header {
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  color: #FFFFFF; /* White text */
+  background: #0a3511; /* Slightly darker than navbar */
+  border-bottom: 1px solid #1a4720;
+  font-size: 0.95rem;
+}
+
+/* FDRA List Container */
+.fdra-list {
+  padding: 0.5rem 0;
+  background: #0B3D12; /* Match navbar background */
+}
+
+/* FDRA Links */
+.fdra-link {
+  display: block;
+  padding: 0.6rem 1rem 0.6rem 2rem;
+  color: #E8F5E9 !important; /* Light greenish-white */
+  text-decoration: none !important;
+  transition: all 0.2s;
+  border-left: 3px solid transparent;
+  font-size: 0.9rem;
+}
+
+/* Match your link color states */
+.fdra-link:visited,
+.fdra-link:link {
+  color: #E8F5E9 !important;
+}
+
+.fdra-link:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #FFFFFF !important;
+  border-left-color: #4CAF50; /* Green accent border on hover */
+}
+
+.fdra-link:active {
+  color: #FF6600 !important; /* Match your active link color */
+  background-color: rgba(255, 102, 0, 0.1);
+}
+
+/* Loading/Empty States */
+.dropdown-empty,
+.fdra-empty {
+  padding: 1.5rem;
+  color: #B0BEC5 !important; /* Light gray for empty states */
+  font-style: italic;
+  text-align: center;
+  background: #0B3D12;
+}
+
+/* No FDRAs message */
+.fdra-empty {
+  padding: 0.75rem 1rem;
+  color: #90A4AE !important;
+  font-size: 0.85rem;
+}
+
+/* ================= RESPONSIVE DROPDOWN ================= */
+
+@media (max-width: 768px) {
+  .dropdown-menu {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90vw;
+    max-width: 300px;
+    max-height: 60vh;
+  }
+  
+  .dropdown-trigger {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+  }
+}
