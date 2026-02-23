@@ -1,7 +1,11 @@
 'use client' // Tell Next.js this is a client component (needs interactivity)
 
 import { useState } from 'react'
+<<<<<<< HEAD
 import { addDispatchArea } from '../../data/page'
+=======
+import { addDispatchArea } from '../../page'
+>>>>>>> ea7079f8ed3cf5cdd2a9daafd9bfd5d63142f5df
 
 export default function AddDispatchForm() {
   // State for form input

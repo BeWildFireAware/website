@@ -1,4 +1,5 @@
 export default function StationSection({ stationData, stationError }) {
+<<<<<<< HEAD
   // Set content based on whether there's an error
   let content;
 
@@ -41,6 +42,27 @@ export default function StationSection({ stationData, stationError }) {
     <section className="Station-section">
       <h2 className="dashboard-heading">Station Records</h2>
       {content}
+=======
+  // super‑simple summary list – just show count and a few names
+  return (
+    <section className="Station-section">
+      <h2 className="dashboard-heading">Station Records</h2>
+      {stationError ? (
+        <p className="error-body">{stationError.message}</p>
+      ) : (
+        <>
+          <p>Total records: {stationData?.length ?? 0}</p>
+          <ul>
+            {stationData?.slice(0, 5).map((s) => (
+              <li key={s.Record_ID}>
+                {s.Station_Name || 'Unnamed'}{' '}
+                {s.NFDRType ? `(${s.NFDRType})` : ''}
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+>>>>>>> ea7079f8ed3cf5cdd2a9daafd9bfd5d63142f5df
     </section>
   );
 }
