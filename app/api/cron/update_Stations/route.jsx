@@ -1,5 +1,5 @@
 // app/api/cron/update-stations/route.js
-import { buildCsvStoreData } from '@/lib/fems/fetchData'
+import { buildCsvStoreData } from '@/app/components/fetchData'
 import { NextResponse } from 'next/server'
 
 export async function GET(request) {

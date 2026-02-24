@@ -1,24 +1,14 @@
 'use client' // Tell Next.js this is a client component (needs interactivity)
 
 import { useState } from 'react'
-<<<<<<< HEAD
 import { addFDRAData } from '@/app/data/page'
-=======
-import { addFDRAData } from '../../page'
->>>>>>> ea7079f8ed3cf5cdd2a9daafd9bfd5d63142f5df
 
 export default function AddFDRAForm({ dispatchData = [] }) {
   // State for all form inputs
   const [FDRAname, setFDRAname] = useState('')
-<<<<<<< HEAD
   const [AVG_BI, setAVG_BI] = useState('') // Build Index
   const [AVG_ERC, setAVG_ERC] = useState('') // Energy Release Component
   const [Dispatch_ID, setDispatchId] = useState('')
-=======
-  const [BI, setBI] = useState('') // Build Index
-  const [ERC, setERC] = useState('') // Energy Release Component
-  const [dispatchId, setDispatchId] = useState('')
->>>>>>> ea7079f8ed3cf5cdd2a9daafd9bfd5d63142f5df
   // State to disable form while submitting
   const [loading, setLoading] = useState(false)
   // State to show success/error messages
@@ -33,15 +23,9 @@ export default function AddFDRAForm({ dispatchData = [] }) {
       // Create FormData object to send to server
       const formData = new FormData()
       formData.append('FDRAname', FDRAname)
-<<<<<<< HEAD
       formData.append('AVG_BI', AVG_BI)
       formData.append('AVG_ERC', AVG_ERC)
       formData.append('Dispatch_ID', Dispatch_ID)
-=======
-      formData.append('BI', BI)
-      formData.append('ERC', ERC)
-      formData.append('dispatchId', dispatchId)
->>>>>>> ea7079f8ed3cf5cdd2a9daafd9bfd5d63142f5df
       // Call server action to add FDRA data
       const result = await addFDRAData(formData)
 
@@ -52,13 +36,8 @@ export default function AddFDRAForm({ dispatchData = [] }) {
         setMessage('FDRA data added successfully!')
         // Clear all inputs
         setFDRAname('')
-<<<<<<< HEAD
         setAVG_BI('')
         setAVG_ERC('')
-=======
-        setBI('')
-        setERC('')
->>>>>>> ea7079f8ed3cf5cdd2a9daafd9bfd5d63142f5df
         setDispatchId('')
         // Refresh page after 1.5 seconds to show new data
         setTimeout(() => window.location.reload(), 1500)
@@ -86,49 +65,29 @@ export default function AddFDRAForm({ dispatchData = [] }) {
       <input
         type="number"
         placeholder="Enter BI"
-<<<<<<< HEAD
         value={AVG_BI}
         onChange={(e) => setAVG_BI(e.target.value)}
-=======
-        value={BI}
-        onChange={(e) => setBI(e.target.value)}
->>>>>>> ea7079f8ed3cf5cdd2a9daafd9bfd5d63142f5df
         disabled={loading}
       />
       {/* Energy Release Component input */}
       <input
         type="number"
         placeholder="Enter ERC"
-<<<<<<< HEAD
         value={AVG_ERC}
         onChange={(e) => setAVG_ERC(e.target.value)}
-=======
-        value={ERC}
-        onChange={(e) => setERC(e.target.value)}
->>>>>>> ea7079f8ed3cf5cdd2a9daafd9bfd5d63142f5df
         disabled={loading}
       />
       {/* Dropdown to select dispatch area */}
       <select 
-<<<<<<< HEAD
         value={Dispatch_ID} 
-=======
-        value={dispatchId} 
->>>>>>> ea7079f8ed3cf5cdd2a9daafd9bfd5d63142f5df
         onChange={(e) => setDispatchId(e.target.value)}
         disabled={loading}
         required
       >
         <option value="">Select Dispatch Area</option>
-<<<<<<< HEAD
         {dispatchData?.map((dispatchArea) => (
           <option key={dispatchArea.Dispatch_ID} value={dispatchArea.Dispatch_ID}>
             {dispatchArea.DispatchName}
-=======
-        {dispatchData?.map((dispatch) => (
-          <option key={dispatch.Dispatch_ID} value={dispatch.Dispatch_ID}>
-            {dispatch.DispatchName}
->>>>>>> ea7079f8ed3cf5cdd2a9daafd9bfd5d63142f5df
           </option>
         ))}
       </select>
