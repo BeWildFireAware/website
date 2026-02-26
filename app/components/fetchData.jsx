@@ -7,8 +7,9 @@
 // 	['52812', 'TAYLOR PARK'],
 // 	['54704', 'NEEDLE CREEK'],
 // ]
+
 import { supabase } from '@/lib/supabase'
-//get date
+//get todays date 
 function formatedDate(date) {
 	const year = date.getFullYear()
 	const month = String(date.getMonth() + 1).padStart(2, '0')
@@ -16,7 +17,7 @@ function formatedDate(date) {
 	return `${year}-${month}-${day}`
 }
 
-
+//map which fuel models have what ID's, for building csv urls
 async function getDataMapFuelModel(){
 	//grab all records currently, future optimize to grab last entry for each station
 	const {data: Records, error: getDataError} = await supabase
@@ -75,35 +76,34 @@ function buildWeatherCsvUrl(startDate, endDate, stationIds){
 }
 
 
-//store in db
-async function storeCsvData(csvRows) {
 
+
+
+
+//store in csv, map station name to ID, filter out bad rows
+async function storeCsvData(csvRows) {
     console.log(`Storing ${csvRows.length} rows to database`)
     
-    //Get a mapping of StationName -> Station_ID from db to use, having issues getting ID directly from csv
+    // Get station/name from supabase(csv doesnt have IDs)
     const { data: stationMap, error: mapError } = await supabase
         .from('StationRecord')
         .select('Station_ID, Station_Name')
     
+	//if error above throw error, prevent crash by returning false	
     if (mapError) {
         console.error('Error fetching station mapping:', mapError)
-        return { success: false, error: mapError.message } //return error but try to continue, print out msg
+        return { success: false, error: mapError.message }
     }
     
-    // { "TAYLOR PARK": 52812, "LUJAN": 54702, etc. }
+	//create map of station name to ID to process csv(if not station name<->id mapping dont store data)
     const nameToIdMap = {}
-
     stationMap.forEach(record => {
-        if (record.Station_Name && record.Station_ID) { //only add to map if both name and ID exist
+        if (record.Station_Name && record.Station_ID) {
             nameToIdMap[record.Station_Name] = record.Station_ID
         }
     })
-    console.log('Station name to ID mapping:', nameToIdMap) //if missing names print
-    
 
-
-    // Define column mapping, easy to add more columns to when needed
-	// NFDRS CSV
+    // NFDRS Column mapping
     const columnMapping = {
         'StationName': 'Station_Name',  
         'BI': 'BI',
@@ -111,15 +111,14 @@ async function storeCsvData(csvRows) {
         'ObservationTime': 'Observation_Time',
         'NFDRType': 'NFDRType',
         'fuel_model': 'fuel_model',
-		'1HrFM' : 'onehourfm',
-		'10HrFM' : 'tenhourfm',
-		'100HrFM' : 'hundredhourfm',
-		'1000HrFM' : 'thousandhourfm',
-		'IC' : 'ic',
-		'SC' : 'sc',
-		'KBDI' : 'kbdi'
+        '1HrFM': 'onehourfm',
+        '10HrFM': 'tenhourfm',
+        '100HrFM': 'hundredhourfm',
+        '1000HrFM': 'thousandhourfm',
+        'IC': 'ic',
+        'SC': 'sc',
+        'KBDI': 'kbdi'
     }
-
 	//WEATHER CSV, implement soon
 	const weatherColumnMapping = {
 		'StationName': 'Station_Name',
@@ -132,116 +131,139 @@ async function storeCsvData(csvRows) {
 		'Precipitation24hr(in)': 'precipitation24hr',
 	}
 
-	//validate rows
-	const validRows = csvRows.filter(row => {
-		if(!row.StationName || row.StationName.trim() === ''){
-			console.log('Skipping row with missing StationName:')
-			return false
-		}
-		if(!nameToIdMap[row.StationName]){
-		console.log(`Skipping row with StationName "${row.StationName}" not found in mapping`)
-		return false
-		}
-		if(!row.ObservationTime || row.ObservationTime.trim() === ''){
-			console.log(`Skipping row with missing ObservationTime for station "${row.StationName}"`)
-			return false
-		}
-		return true
-	})
-	console.log(`Validated rows: ${validRows.length} valid, ${csvRows.length - validRows.length} invalid`)
-	
-
-	//map out existing records for today to preven duplicates
-	const today = new Date().toISOString().split('T')[0] //get rid of time, keep date
-	const existingKeys = new Set()
-	if(validRows.length > 0){
-		const stationIds = validRows.map(row => nameToIdMap[row.StationName]).filter(Boolean)
-    
-		const { data: existing } = await supabase
-			.from('StationRecord')
-			.select('Station_ID, Observation_Time')
-			.in('Station_ID', stationIds)
-			.like('Observation_Time', `${today}%`)
-
-		if (existing) {
-			existing.forEach(record => {
-				const dateStr = record.Observation_Time.split('T')[0]
-				existingKeys.add(`${record.Station_ID}:${dateStr}`)
-			})
-		}
-	}
-	console.log(`Found ${existingKeys.size} existing records for today to check for duplicates against`)
-    
-    // Transform each row
-    const dbRows = validRows.map(row => {
-        const dbRow = {}
-        
-        // Map fields csv-> db
-        Object.entries(columnMapping).forEach(([csvField, dbField]) => {
-            if (row[csvField] !== undefined && row[csvField] !== '') {
-                dbRow[dbField] = row[csvField]
+    // Transform rows first to get normalized dates and station IDs(for duplicates)
+    const transformedRows = csvRows //.fliter.map.filter, all at once to get rid of bad rows
+        .filter(row => {
+            // if no name, not in map, or no obs date, skip
+            if (!row.StationName || !nameToIdMap[row.StationName] || !row.ObservationTime) {
+                return false
             }
+            return true
         })
-        
-        //Look up Station_ID using StationName
-        const stationName = row.StationName
-        if (stationName && nameToIdMap[stationName]) {
-            dbRow.Station_ID = nameToIdMap[stationName]
-
-			//search dups
-			const recordDate = dbRow.ObservationTime //MAJOR BUG HERE, NEED TO REORDER OPERATIONS SO THAT IT CHECKS IF OBS TIME IS UNDEFINED FIRST
-			const recordKey = `${dbRow.Station_ID}:${recordDate}`
-			if(existingKeys.has(recordKey)){
-				console.log(`Duplicate record found for Station_ID ${dbRow.Station_ID} on ${recordDate}, skipping insertion`)
-				return null //skip this record by returning null
-			}
-
-            console.log(`Mapped: ${stationName}->ID: ${dbRow.Station_ID}`)
-        } else { 
-            console.error(`Could not find Station_ID for name: "${stationName}"`) //this prints many time
+        .map(row => { //map csv row to db row
+            const dbRow = {}
             
-        }
-        
-        // default fuel model to Y if null
-        if (!dbRow.fuel_model) {
-            dbRow.fuel_model = 'Y'
-        }
-        
-        return dbRow
-    }).filter(row => row !== null) // Only keep rows that are not null, already filtered by undefined, this is filter for dups
-    
+			//for each entry on NFDRS map, normalize date(stored different in csv and db)
+            Object.entries(columnMapping).forEach(([csvField, dbField]) => {
+                if (row[csvField] !== undefined && row[csvField] !== '') { //in not undefined or empty
+                    if (dbField === 'Observation_Time' && row[csvField].includes('/')) { //if csv date has /(mm/dd/yyyy) convert to db entry
+                        const [month, day, year] = row[csvField].split('/')
+                        dbRow[dbField] = `${year}-${month}-${day}`
+                    } else {
+                        dbRow[dbField] = row[csvField] //taylor park -> 52812
+                    }
+                }
+            })
+            
+            dbRow.Station_ID = nameToIdMap[row.StationName] //dbrow to add is station id from map based on station name in csv
+            
+            if (!dbRow.fuel_model) { //make sure fuel model is always populated, default to Y if null
+                dbRow.fuel_model = 'Y'
+            }
+            
+            return dbRow
+        })
+        .filter(row => row.Observation_Time && row.Station_ID) //this shouldnt be necessary with the first filter, but just in case, make sure we have station id and obs time for duplicates
 
-	//show rows ready for adding(#)
-    console.log(`Prepared ${dbRows.length} rows for insertion (filtered out ${csvRows.length - dbRows.length} rows with no Station_ID)`)
-    
-    if (dbRows.length === 0) {
-        console.error('No valid rows to insert - all missing Station_ID')
-        return { success: false, error: 'No valid rows' }
+    if (transformedRows.length === 0) {
+        console.log('No valid rows to process')
+        return { success: true, count: 0 }
     }
+
+    // Get ALL unique combinations of (Station_ID, Observation_Time) from csv
+   
+    const uniqueDateCombinations = new Map() 
     
-    // Insert all rows at once, issues in the future?
-    const { data, error } = await supabase
+    transformedRows.forEach(row => { //for each row in rows to add get id obs time, if not in map add to map
+        const key = `${row.Station_ID}:${row.Observation_Time}`
+        if (!uniqueDateCombinations.has(key)) {
+            uniqueDateCombinations.set(key, row)
+        }
+    })
+
+    console.log(`CSV contains ${transformedRows.length} total rows with ${uniqueDateCombinations.size} unique station-date combinations`)
+
+    // Supabase can handle IN clauses with multiple values
+   
+    // Group by station for more efficient querying
+    const obsByStation = {} //dictionary of station id to array of obs times
+    transformedRows.forEach(row => {
+        if (!obsByStation[row.Station_ID]) {
+            obsByStation[row.Station_ID] = []
+        }
+        obsByStation[row.Station_ID].push(row.Observation_Time) //ID -> [obs time 1, obs time 2, obs time 3]
+    })
+
+    // For each station, query ONLY the dates we care about
+    let existingCount = 0 //count of rows that exist in db already, for logging/debug
+    const existingDates = new Set()
+
+    // evil line:
+	//convert obsBystation obj into array
+	//.map transforms each entry creating the array [station id, [dates]]
+	//async function(returns promises), need to query db, can fail or succed depending on supabase status, prevents crash
+    const stationPromises = Object.entries(obsByStation).map(async ([stationId, dates]) => { 
+        // Remove duplicates from dates array
+		//...: spread operator to convert set back into array immediately for use
+        const uniqueDates = [...new Set(dates)] //create a new set from dates array(removes duplicates for same station), unlikely but just in case
+        
+        // Query only the specific dates for this station
+        const { data: existingData, error: datecallerror } = await supabase
+            .from('StationRecord')
+            .select('Station_ID, Observation_Time')
+            .eq('Station_ID', stationId)
+            .in('Observation_Time', uniqueDates) // parallel query for all dates in this station
+
+        if (datecallerror) {
+            console.error(`Error checking station ${stationId}:`, datecallerror)
+            return []
+        }
+
+        return existingData || [] //return array of existing records for this station, or empty array if none
+    })
+
+    // Wait for all station queries to complete
+    const stationResults = await Promise.all(stationPromises) //await async promises(parallel queries)
+    
+    // Flatten results and add to existingDates, ex: [[obj, obj], [obj], []]-> {stationID: 52812, obsTime: 2026-01-20}, {stationID: 52812, obsTime: 2026-01-21}, etc
+    stationResults.flat().forEach(record => {
+        existingDates.add(`${record.Station_ID}:${record.Observation_Time}`) //add id:date to existing dates to drop
+        existingCount++ //increment counter
+    })
+
+    console.log(`Found ${existingCount} existing records that match CSV dates`)
+
+    // Filter out duplicates
+    const newRows = transformedRows.filter(row => { //complete filtered data
+        const key = `${row.Station_ID}:${row.Observation_Time}` //get this rows key:value
+        return !existingDates.has(key) //return true or false for each row, if key in existing dates, drop it, if not, keep it
+    })
+
+    console.log(`\nDuplicate Analysis:`)
+    console.log(`- Total CSV rows: ${transformedRows.length}`)
+    console.log(`- Unique station-date combos: ${uniqueDateCombinations.size}`)
+    console.log(`- Already in database: ${existingCount}`)
+    console.log(`- New rows to insert: ${newRows.length}`)
+
+	// If no new rows to insert, return early
+    if (newRows.length === 0) {
+        console.log('No new rows to insert')
+        return { success: true, count: 0 }
+    }
+
+    // Insert new rows
+    const { data, error: addRowsError } = await supabase
         .from('StationRecord')
-        .insert(dbRows)
-    
-		
-    if (error) {
-        console.error('Error inserting data:', error)
-        return { 
-            success: false, 
-            error: error.message,
-            rowsAttempted: csvRows.length 
-        }
-    }
-    
-    console.log(`Successfully stored ${dbRows.length} rows`)
-    return { 
-        success: true, 
-        count: dbRows.length,
-        data: data 
-    }
-}
+        .insert(newRows)
 
+    if (addRowsError) { //prevent crash
+        console.error('Error inserting data:', addRowsError)
+        return { success: false, error: addRowsError.message }
+    }
+
+    console.log(`Successfully stored ${newRows.length} new rows`)
+    return { success: true, count: newRows.length }
+}
 
 
 
@@ -289,6 +311,7 @@ export async function buildCsvStoreData() {
 			}
 
 			const headers = lines[0].split(',').map(col => col.replaceAll('"', ''))
+			console.log("csv headers:", headers)
 			if (allColumnNames.length === 0) {
 				allColumnNames = headers
 			}
