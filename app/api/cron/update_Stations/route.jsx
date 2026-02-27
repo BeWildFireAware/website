@@ -1,5 +1,5 @@
 // app/api/cron/update-stations/route.js
-import { buildCsvStoreData } from '@/app/components/fetchData'
+import { importService } from '@/lib/database/ImportDataService.jsx'
 import { NextResponse } from 'next/server'
 
 export async function GET(request) {
@@ -7,7 +7,7 @@ export async function GET(request) {
   
   try {
     //run fetcg
-    const result = await buildCsvStoreData()
+    const result = await importService.runDailyImport()
     
     console.log(`Cron job complete: ${result.summary.totalRows} rows processed`)
     
@@ -15,7 +15,7 @@ export async function GET(request) {
     return NextResponse.json({
       success: true,
       message: 'Station data updated successfully',
-      rowsProcessed: result.summary.totalRows,
+      stats: result,
       timestamp: new Date().toISOString()
     })
     
