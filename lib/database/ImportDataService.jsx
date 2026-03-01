@@ -28,19 +28,19 @@ async function fetchWeatherData(startDate, endDate, stationIds) {
 
 // CSV parsers
 function parseCSV(csvText) {
-    const lines = csvText.trim().split('\n')
+    const lines = csvText.trim().split('\n') //split into lines, trim to remove any leading/trailing whitespace
     if (lines.length < 2) return []
     
-    const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim())
+    const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim()) //remove double quotes and trim whitespace from headers
     
     const rows = []
     for (let i = 1; i < lines.length; i++) {
-        const values = lines[i].split(',').map(v => v.replace(/"/g, '').trim())
+        const values = lines[i].split(',').map(v => v.replace(/"/g, '').trim()) //remove second double quotes and trim whitespace from values
         const row = {}
         headers.forEach((header, index) => {
             row[header] = values[index] || ''
         })
-        rows.push(row)
+        rows.push(row) //row{StationName: 'Station A', ObservationTime: '2026-01-01', BI: '5', ...}
     }
     return rows
 }
@@ -49,7 +49,7 @@ export const importService = { //group fetch, duplicate check, transform, and in
     async runDailyImport() {
         console.log('Starting daily import...')
         const results = {
-            nfdr: { success: true, inserted: 0, total: 0 },
+            nfdr: { success: true, inserted: 0, total: 0 }, //structures to hold import results for reporting, can expand with more details as needed
             weather: { success: true, inserted: 0, total: 0 }
         }
         
@@ -75,82 +75,88 @@ export const importService = { //group fetch, duplicate check, transform, and in
             console.error('Import failed:', error)
             throw error
         }
-    },
+    }, //separate object params (fx1, fx2) 
 
     async previewNFDRData(nameToIdMap, startDate, endDate) {
-        console.log('🔍 DEBUG - NFDR Preview Starting')
+        
         console.log('Station name map:', Object.keys(nameToIdMap))
         
-        const stationsByFuelModel = await grabStations.groupStationsByFuelModel(supabase)
-        console.log('Stations by fuel model:', stationsByFuelModel)
+        //bug here
+        const stationsByFuelModel = await grabStations.groupStationsByFuelModel(supabase) //call outside class to group by fuel model, ISSUE, chicken or egg, need data to pull new data!, do fuel models ever change? if not ADD TO Stations Table
+        //console.log('Stations by fuel model:', stationsByFuelModel)
         
-        let allRows = []
-        let newRows = []
+        //local variables to track results for reporting
+        let allRows = [] //for reporting total rows processed 
+        let newRows = [] //to track new rows that will be inserted, 
         let duplicateCount = 0
         
         for (const [fuelModel, stationIds] of Object.entries(stationsByFuelModel)) {
-            console.log(`\n📊 Processing fuel model ${fuelModel} with stations:`, stationIds)
+            console.log(`\n Processing fuel model ${fuelModel} with stations:`, stationIds)
             
             try {
                 // Fetch CSV
-                const csvText = await fetchNFDRData(startDate, endDate, stationIds, fuelModel)
-                const rows = parseCSV(csvText)
+                const csvText = await fetchNFDRData(startDate, endDate, stationIds, fuelModel) //outside call to fetch current data for the dates to add
+                const rows = parseCSV(csvText) //get header: val pairs
                 
-                console.log(`  Raw CSV rows: ${rows.length}`)
-                if (rows.length > 0) {
+                //console.log(`  Raw CSV rows: ${rows.length}`) //evil line for harsh debugging
+                
+                if (rows.length > 0) { //show example row, for debugging
                     console.log('  First raw row sample:', rows[0])
                     console.log('  CSV Headers:', Object.keys(rows[0]))
                 }
                 
                 // Check station name mapping
                 const validRows = rows.filter(row => {
-                    const hasStation = row.StationName && nameToIdMap[row.StationName]
+                    const hasStation = row.StationName && nameToIdMap[row.StationName] //keep all rows that have station IDcsv to stationIDdb, drop all stations that dont exist in db
                     if (!hasStation) {
-                        console.log(`  ❌ Station "${row.StationName}" not found in mapping`)
+                        console.log(`Station "${row.StationName}" not found in mapping`)
                     }
                     return hasStation
                 })
                 
-                console.log(`  Valid rows (with station mapping): ${validRows.length}`)
+                console.log(`Valid rows (with station mapping): ${validRows.length}`) 
                 
-                if (validRows.length === 0) continue
+                if (validRows.length === 0) continue //if not valid rows, skip to next fuel model
                 
                 // Transform rows
                 const transformedRows = validRows.map(row => {
-                    const transformed = NFDRCalls.transformNFDRData(row, nameToIdMap[row.StationName])
-                    console.log('  Transformed row sample:', transformed)
+                    const transformed = NFDRCalls.transformNFDRData(row, nameToIdMap[row.StationName]) //outside call to transform to db format, add station id, and fuel model
+                    console.log('Transformed row sample:', transformed)
                     return transformed
                 })
                 
-                allRows = [...allRows, ...transformedRows]
+                allRows = [...allRows, ...transformedRows] //all rows tranformed... to accumulate all rows for reporting total processed, turned into array for imeediate use
                 
                 // Check existing records
-                const stationIds_ = [...new Set(transformedRows.map(r => r.Station_ID))]
+                const stationIds_ = [...new Set(transformedRows.map(r => r.Station_ID))] //staionId exists elsewhere, prevent collision
                 const dates = transformedRows.map(r => r.Observation_Time)
                 
                 console.log(`  Checking duplicates for stations:`, stationIds_)
-                console.log(`  Dates:`, dates.slice(0, 3))
                 
-                const existingKeys = await NFDRCalls.findExistingNFDRRecords(
-                    supabase, stationIds_, dates
-                )
+                
+                const existingKeys = await NFDRCalls.findExistingNFDRRecords(supabase, stationIds_, dates) //existsing records for dates pulled from cv
+
                 
                 console.log(`  Existing keys found:`, existingKeys.size)
+                //console.log(`  Sample existing key:`, [...existingKeys][0])
                 
+                //filter duplicates, only keep new rows that dont have existing key combinations of stationId + date + fuelModel
                 const newForThisGroup = transformedRows.filter(row => {
-                    const key = `${row.Station_ID}:${row.Observation_Time}`
+                    const key = `${row.Station_ID}:${row.Observation_Time}:${row.Fuel_Model}`
+                    console.log(`  Checking key: ${key} - Exists: ${existingKeys.has(key)}`)
                     const exists = existingKeys.has(key)
-                    if (exists) console.log(`  🔑 Key exists: ${key}`)
-                    return !exists
+                    if (exists) console.log(`  🔑 Key exists: ${key}`) //never hits
+                    return !exists //keep only if it does NOT exist in db
                 })
                 
                 console.log(`  New rows for this group: ${newForThisGroup.length}`)
                 
-                newRows = [...newRows, ...newForThisGroup]
-                duplicateCount += transformedRows.length - newForThisGroup.length
+                newRows = [...newRows, ...newForThisGroup] //only new NFDR rows to be inserted, for reporting and immediate use
+
+                duplicateCount += transformedRows.length - newForThisGroup.length //how many were dropped
                 if (newForThisGroup.length > 0) {
-                    NFDRCalls.insertNFDRRecords(supabase, newForThisGroup)
-                    console.log(`  Inserted ${newForThisGroup.length} new NFDR records for fuel model ${fuelModel}`)
+                    NFDRCalls.insertNFDRRecords(supabase, newForThisGroup) //if records still, insert them
+                    console.log(`Inserted ${newForThisGroup.length} new NFDR records for fuel model ${fuelModel}`)
                 }
                 
             } catch (error) {

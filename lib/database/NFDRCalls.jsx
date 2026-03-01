@@ -9,125 +9,183 @@ import { Console } from "console";
 //search for dups, insert to table
 export class NFDRCalls {
 
-    static async findExistingNFDRRecords(stationIds, dates) { //for duplicates
+    // /src/lib/database/models/nfdr.js
 
+    static async findExistingNFDRRecords(supabase, stationIds, dates, fuelModels) {
         if(!stationIds.length || !dates.length) return new Set()
-        
+
+        // We need to check exact combinations of Station_ID + Observation_Time + Fuel_Model
         const { data, error } = await supabase 
             .from('NFDRRecords')
-            .select('Station_ID, Observation_Time')
+            .select('Station_ID, Observation_Time, Fuel_Model')
             .in('Station_ID', stationIds)
-            .in('Observation_Time', dates)    
+            .in('Observation_Time', dates)
+
         if (error) {
             console.error('Error fetching existing NFDR records:', error)
-            return new Set() //return empty set on error to prevent crash, will treat as no existing records
+            return new Set()
         }
-        const existingDates = new Set() 
+
+        const existingKeys = new Set() 
         data?.forEach(record => {
-            const dateString = record.Observation_Time //expecting format '2026-01-20'
-            existingDates.add(`${record.Station_ID}:${dateString}`) //add stationID:date to set for easy lookup
+            // Include Fuel_Model in the key!
+            const key = `${record.Station_ID}:${record.Observation_Time}:${record.Fuel_Model}`
+            existingKeys.add(key)
         })   
-        return existingDates
+
+        console.log(`Found ${existingKeys.size} existing record combinations`)
+        return existingKeys
+    }
+    // Before inserting, check against database one more time with full keys
+    static async validateRecordsBeforeInsert(supabase, records) {
+        // Group by station for efficient querying
+        const recordsByStation = {}
+        records.forEach(record => {
+            if (!recordsByStation[record.Station_ID]) {
+                recordsByStation[record.Station_ID] = []
+            }
+            recordsByStation[record.Station_ID].push(record)
+        })
+        
+        const validRecords = []
+        
+        for (const [stationId, stationRecords] of Object.entries(recordsByStation)) {
+            const dates = stationRecords.map(r => r.Observation_Time)
+            const fuelModels = stationRecords.map(r => r.Fuel_Model)
+            
+            // Query existing records for this station
+            const { data: existing } = await supabase
+                .from('NFDRRecords')
+                .select('Observation_Time, Fuel_Model')
+                .eq('Station_ID', stationId)
+                .in('Observation_Time', dates)
+            
+            // Create set of existing combinations
+            const existingCombos = new Set()
+            existing?.forEach(record => {
+                existingCombos.add(`${record.Observation_Time}:${record.Fuel_Model}`)
+            })
+            
+            // Filter records
+            stationRecords.forEach(record => {
+                const combo = `${record.Observation_Time}:${record.Fuel_Model}`
+                if (!existingCombos.has(combo)) {
+                    validRecords.push(record)
+                } else {
+                    console.log(`Duplicate prevented: Station ${stationId}, Date ${record.Observation_Time}, Fuel ${record.Fuel_Model}`)
+                }
+            })
+        }
+        
+        return validRecords
     }
 
 
     //insert
     // /src/lib/database/models/nfdr.js
 
-static async insertNFDRRecords(supabase, records) {
-    console.log('Attempting to insert NFDR records:', {
-        count: records.length,
-        sample: records[0] // Log first record to see structure
-    })
-    
-    if(!records.length) return { success: true, count: 0 }
-    
-    // Validate each record before insert
-    const validatedRecords = records.map(record => {
-        // Make sure all required fields are present
-        const validated = {
-            Station_ID: record.Station_ID,
-            Observation_Time: record.Observation_Time,
-            Fuel_Model: record.Fuel_Model || 'Y',
-            NFDRType: record.NFDRType || null,
-            OneHourFM: record.OneHourFM ?? null,
-            TenHourFM: record.TenHourFM ?? null,
-            HundredHourFM: record.HundredHourFM ?? null,
-            ThousandHourFM: record.ThousandHourFM ?? null,
-            IC: record.IC ?? null,
-            KBDI: record.KBDI ?? null,
-            SC: record.SC ?? null,
-            ERC: record.ERC ?? null,
-            BI: record.BI ?? null
-        }
+    static async insertNFDRRecords(supabase, records) {
+        console.log(`📝 Attempting to insert ${records.length} NFDR records`)
         
-        // Log any missing required fields
-        if (!validated.Station_ID) console.error('Missing Station_ID in record:', record)
-        if (!validated.Observation_Time) console.error('Missing Observation_Time in record:', record)
+        if(!records.length) return { success: true, count: 0 }
         
-        return validated
-    })
-    
-    console.log('Validated records sample:', validatedRecords[0])
-    
+        // Log what we're about to insert
+        const keysToInsert = records.map(r => 
+            `${r.Station_ID}:${r.Observation_Time}:${r.Fuel_Model}`
+        )
+        console.log('Keys to insert:', keysToInsert.slice(0, 5))
+        
         const { data, error } = await supabase
             .from('NFDRRecords')
-            .insert(validatedRecords)
+            .insert(records)
             .select()
-    
-        if (error) 
-            {
-            console.error('Error inserting NFDR records:', {
-                message: error.message,
-                details: error.details,
-                hint: error.hint,
-                code: error.code
-            })
+        
+        if (error) {
+            // Check for unique constraint violation
+            if (error.code === '23505') { // PostgreSQL unique violation code
+                console.error('⚠️ Unique constraint violation:', {
+                    message: error.message,
+                    details: error.details
+                })
+                
+                // Try to identify which records caused the violation
+                // Insert one by one to find problematic records
+                const successfulInserts = []
+                const failedInserts = []
+                
+                for (const record of records) {
+                    const { error: singleError } = await supabase
+                        .from('NFDRRecords')
+                        .insert(record)
+                        .select()
+                    
+                    if (singleError) {
+                        if (singleError.code === '23505') {
+                            console.log('❌ Duplicate skipped:', 
+                                `${record.Station_ID}:${record.Observation_Time}:${record.Fuel_Model}`
+                            )
+                            failedInserts.push(record)
+                        } else {
+                            console.error('Other error:', singleError)
+                        }
+                    } else {
+                        successfulInserts.push(record)
+                    }
+                }
+                
+                return { 
+                    success: true, 
+                    count: successfulInserts.length,
+                    failed: failedInserts.length,
+                    note: `${successfulInserts.length} inserted, ${failedInserts.length} duplicates skipped`
+                }
+            }
+            
+            console.error('❌ Error inserting NFDR records:', error)
             return { success: false, error: error.message }
         }
-    
-        console.log('Insert successful. Returned data:', {
-            count: data?.length || 0,
-            data: data // This should contain the inserted rows
-        })
-    
-        return { 
-            success: true, 
-            count: validatedRecords.length, 
-            data: data || [] 
-        }
+        
+        console.log(`✅ Successfully inserted ${data?.length || 0} records`)
+        return { success: true, count: data?.length || 0, data }
     }
 
     //transform(string to number, headers)
     static transformNFDRData(csvData, stationId) {
-         let fuelModel = csvData.FuelModel || csvData.Fuel_Model || 'Y'
-    
-        // Ensure it's exactly 1 character
-        if (fuelModel && fuelModel.length > 1) {
-            fuelModel = fuelModel.charAt(0)
-        }
+        // Allowed columns in NFDRRecords table (excluding those we set manually)
+        const ALLOWED_DB_FIELDS = new Set([
+            'OneHourFM', 'TenHourFM', 'HundredHourFM', 'ThousandHourFM',
+            'IC', 'KBDI', 'SC', 'ERC', 'BI', 'NFDRType'
+        ]);
+
+        // Set Fuel_Model with default
+        let fuelModel = csvData.FuelModel || csvData.Fuel_Model || 'Y';
+        if (fuelModel && fuelModel.length > 1) fuelModel = fuelModel.charAt(0);
+
         const dbRow = {
-            Station_ID: stationId, //add station id to each record
-            Observation_Time: convertDateByFormat(csvData.ObservationTime, 'MM/DD/YYYY'), //convert date format for db
+            Station_ID: stationId,
+            Observation_Time: convertDateByFormat(csvData.ObservationTime, 'MM/DD/YYYY'),
             Fuel_Model: fuelModel,
             NFDRType: csvData.NFDRType || null
-        }
+        };
 
         Object.entries(NFDR_MAPPINGS).forEach(([csvField, dbField]) => {
-            if(dbField == 'Station_ID' || dbField == 'Observation_Time') return //already mapped
+            // Skip fields we already set or that are not allowed
+            if (dbField === 'Station_ID' || dbField === 'Observation_Time' || dbField === 'Fuel_Model') return;
+            if (!ALLOWED_DB_FIELDS.has(dbField)) return; // Ignore unknown columns (like Station_Name)
 
-            const value = csvData[csvField]
-            if(value === undefined || value === null || value === '') {
-                dbRow[dbField] = null //handle missing values as null
-                return
+            const value = csvData[csvField];
+            if (value === undefined || value === null || value === '') {
+                dbRow[dbField] = null;
+                return;
             }
-            if(NFDR_NUMERIC_FIELDS.includes(dbField)) {
-                const numericValue = parseFloat(value)
-                dbRow[dbField] = isNaN(numericValue) ? null : numericValue
+            if (NFDR_NUMERIC_FIELDS.includes(dbField)) {
+                const numericValue = parseFloat(value);
+                dbRow[dbField] = isNaN(numericValue) ? null : numericValue;
             } else {
-                dbRow[dbField] = value
+                dbRow[dbField] = value; // For NFDRType (string)
             }
-        })
-        return dbRow
+        });
+
+        return dbRow;
     }
 }

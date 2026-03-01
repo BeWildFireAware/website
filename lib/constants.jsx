@@ -3,8 +3,7 @@ export const BASE_WEATHER_CSV_URL = 'https://fems.fs2c.usda.gov/api/climatology/
 export const BASE_NFDR_URL = 'https://fems.fs2c.usda.gov/api/ext-climatology/download-nfdr-daily-summary/?dataset=all'
 
 //column mappings from csv to db
-export const NFDR_MAPPINGS = {
-    'StationName': 'Station_Name',  
+export const NFDR_MAPPINGS = {  
     'BI': 'BI',
     'ERC': 'ERC',
     'ObservationTime': 'Observation_Time',
@@ -19,18 +18,19 @@ export const NFDR_MAPPINGS = {
     'KBDI': 'KBDI'
 }
 export const WEATHER_MAPPINGS = {
-    'StationName': 'Station_Name',
-		'TemperatureMin(F)': 'Temp_Min',
-		'TemperatureMax(F)': 'Temp_Max',
-		'RelativeHumidityMin(%)': 'Relative_Humidity_Min',
-		'RelativeHumidityMax(%)': 'Relative_Humidity_Max',
-		'WindSpeedMax(mph)': 'Wind_Speed_Max',
-		'GustDirection(degrees)': 'Gust_Direction',
-		'Precipitation24hr(in)': 'Precipitation24hr',
-        'Date': 'Observation_Time',
-        'DailySnowFlag': 'Snow_Flag',
-        'GustDirectionMaxTime(hh)': 'Gust_Direction_Max_Time',
-        'MaxSolarRadiation(W/m2)': 'Max_Solar_Radiation',
+    'TemperatureMin(F)': 'Temp_Min',
+    'TemperatureMax(F)': 'Temp_Max',
+    'RelativeHumidityMin(%)': 'Relative_Humidity_Min',
+    'RelativeHumidityMax(%)': 'Relative_Humidity_Max',
+    'WindSpeedMax(mph)': 'Wind_Speed_Max',
+    'GustDirection(degrees)': 'Gust_Direction',
+    'Precipitation24hr(in)': 'Precipitation24hr',
+    'Date': 'Observation_Time',
+    'DailySnowFlag': 'Snow_Flag',
+    'GustDirectionMaxTime(hh)': 'Gust_Direction_Max_Time',
+    'MaxSolarRadiation(W/m2)': 'Max_Solar_Radiation',
+    'Date': 'Observation_Time',
+    'OberservationType': 'Observation_Type'
 }
 // Define which fields are numeric (need conversion from strings in csv)
 export const NFDR_NUMERIC_FIELDS = [

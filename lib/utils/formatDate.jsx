@@ -1,7 +1,7 @@
 //utlis are used for simple functions to be used elsewhere(many places)
 //functions to format date as YYYY-MM-DD for db/csv queries, duplicates
 
-export function formattedDate(date) {
+export function formattedDate(date) { //will need future refactor for forecast data dates only
 	const year = date.getFullYear()
 	const month = String(date.getMonth() + 1).padStart(2, '0')
 	const day = String(date.getDate()).padStart(2, '0')
@@ -9,7 +9,9 @@ export function formattedDate(date) {
 }
 export function getDateRange(){ //return start and end date for csv query, ex: 2026-01-01 to 2026-01-31
     const today = new Date()
-    const firstOfMonth = new Date(today.getFullYear(), today.getMonth(), 1)
+    //const firstOfMonth = new Date(today.getFullYear(), today.getMonth(), 1)
+    const firstOfMonth = new Date(today)
+    firstOfMonth.setDate(today.getDate() - 30) //get data for last 30 days, can adjust as needed
     return {
         startDate: formattedDate(firstOfMonth),
         endDate: formattedDate(today)
