@@ -27,26 +27,45 @@ export class grabStations {
     //for NFDR data need fuel model
 
     static async getStationFuelModels() {
-        // This is more complex - we need the latest record per station
-        // For now, we can query NFDRRecords
-        const { data, error } = await supabase
-            .from('NFDRRecords')
-            .select('Station_ID, Fuel_Model')
-            .order('Observation_Time', { ascending: false }) //get most recent records first
+        // First, get all stations
+        const { data: allStations, error: stationsError } = await supabase
+            .from('Stations')
+            .select('ID')
         
-        if (error) {
-            console.error('Error fetching fuel models:', error)
+        if (stationsError) {
+            console.error('Error fetching all stations:', stationsError)
             return {}
         }
         
-        // Get unique station with most recent fuel model(expecting changes)
+        // Then get existing fuel models from records
+        const { data: existingRecords, error: recordsError } = await supabase
+            .from('NFDRRecords')
+            .select('Station_ID, Fuel_Model')
+            .order('Observation_Time', { ascending: false })
+        
+        if (recordsError) {
+            console.error('Error fetching fuel models:', recordsError)
+            return {}
+        }
+        
+        // Create map with defaults for all stations
         const fuelModelMap = {}
-        data.forEach(record => {
-            if (!fuelModelMap[record.Station_ID] && record.Fuel_Model) {
+        
+        // First, set default 'Y' for ALL stations
+        allStations.forEach(station => {
+            fuelModelMap[station.ID] = 'Y'
+        })
+        
+        // Then override with any existing fuel models from records
+        existingRecords.forEach(record => {
+            // Only override if we don't already have a fuel model for this station
+            // or if we want to use the most recent
+            if (record.Fuel_Model) {
                 fuelModelMap[record.Station_ID] = record.Fuel_Model
             }
         })
         
+        console.log(`Fuel model map created for ${Object.keys(fuelModelMap).length} stations`)
         return fuelModelMap
     }
     

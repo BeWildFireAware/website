@@ -5,13 +5,14 @@ import {
 } from "@/lib/constants.jsx";
 
 import { convertDateByFormat } from "@/lib/utils/formatDate.jsx";
-import { Console } from "console";
+
 //search for dups, insert to table
-export class NFDRCalls {
 
-    // /src/lib/database/models/nfdr.js
+export class NFDRCalls { //group of functons
 
-    static async findExistingNFDRRecords(supabase, stationIds, dates, fuelModels) {
+
+
+    static async findExistingNFDRRecords(supabase, stationIds, dates, fuelModels) { //will probably need to add fuel models infuture if they can change,
         if(!stationIds.length || !dates.length) return new Set()
 
         // We need to check exact combinations of Station_ID + Observation_Time + Fuel_Model
@@ -19,7 +20,7 @@ export class NFDRCalls {
             .from('NFDRRecords')
             .select('Station_ID, Observation_Time, Fuel_Model')
             .in('Station_ID', stationIds)
-            .in('Observation_Time', dates)
+            .in('Observation_Time', dates) //dates to check for
 
         if (error) {
             console.error('Error fetching existing NFDR records:', error)
@@ -27,16 +28,16 @@ export class NFDRCalls {
         }
 
         const existingKeys = new Set() 
-        data?.forEach(record => {
-            // Include Fuel_Model in the key!
-            const key = `${record.Station_ID}:${record.Observation_Time}:${record.Fuel_Model}`
+        data?.forEach(record => {  //if record exists loop though, create key
+            const key = `${record.Station_ID}:${record.Observation_Time}:${record.Fuel_Model}` 
             existingKeys.add(key)
         })   
 
         console.log(`Found ${existingKeys.size} existing record combinations`)
-        return existingKeys
+        return existingKeys //all existing combinations in db
     }
-    // Before inserting, check against database one more time with full keys
+
+    // Before inserting, check against database one more time, not used currently, may be useful for testing later?
     static async validateRecordsBeforeInsert(supabase, records) {
         // Group by station for efficient querying
         const recordsByStation = {}
@@ -102,38 +103,35 @@ export class NFDRCalls {
         
         if (error) {
             // Check for unique constraint violation
-            if (error.code === '23505') { // PostgreSQL unique violation code
-                console.error('⚠️ Unique constraint violation:', {
-                    message: error.message,
-                    details: error.details
-                })
+            if (error.code === '23505') { // PostgreSQL violation code for unqie constraint, kept happening
+                console.error('Unique constraint violation:', { message: error.message,details: error.details})
                 
                 // Try to identify which records caused the violation
-                // Insert one by one to find problematic records
+                // Insert one by one to find problematic records, for debugging, not efficient for large batches but helps identify issues
                 const successfulInserts = []
                 const failedInserts = []
-                
+
+
+                //will need refactor for larger batches, but for now this will help identify which records are causing duplicates or other issues
                 for (const record of records) {
-                    const { error: singleError } = await supabase
+                    const { error: rnumError } = await supabase
                         .from('NFDRRecords')
                         .insert(record)
                         .select()
                     
-                    if (singleError) {
-                        if (singleError.code === '23505') {
-                            console.log('❌ Duplicate skipped:', 
-                                `${record.Station_ID}:${record.Observation_Time}:${record.Fuel_Model}`
-                            )
-                            failedInserts.push(record)
+                    if (rnumError) { //if error with individual record, check if it's duplicate or other error
+                        if (rnumError.code === '23505') {
+                            console.log('Duplicate skipped:', `${record.Station_ID}:${record.Observation_Time}:${record.Fuel_Model}`)
+                            failedInserts.push(record) //add failed lines
                         } else {
-                            console.error('Other error:', singleError)
+                            console.error('Other error:', rnumError)
                         }
                     } else {
                         successfulInserts.push(record)
                     }
                 }
                 
-                return { 
+                return {  //fix output in future (reminants of testing/debugging)
                     success: true, 
                     count: successfulInserts.length,
                     failed: failedInserts.length,
@@ -141,18 +139,18 @@ export class NFDRCalls {
                 }
             }
             
-            console.error('❌ Error inserting NFDR records:', error)
+            console.error('Error inserting NFDR records:', error)
             return { success: false, error: error.message }
         }
         
-        console.log(`✅ Successfully inserted ${data?.length || 0} records`)
+        console.log(`Successfully inserted ${data?.length || 0} records`)
         return { success: true, count: data?.length || 0, data }
     }
 
     //transform(string to number, headers)
     static transformNFDRData(csvData, stationId) {
-        // Allowed columns in NFDRRecords table (excluding those we set manually)
-        const ALLOWED_DB_FIELDS = new Set([
+        // Allowed columns in NFDRRecords table (excluding those i set manually)
+        const ALLOWED_DB_FIELDS = new Set([ //all numeric fields (string to float or int)
             'OneHourFM', 'TenHourFM', 'HundredHourFM', 'ThousandHourFM',
             'IC', 'KBDI', 'SC', 'ERC', 'BI', 'NFDRType'
         ]);
@@ -168,7 +166,7 @@ export class NFDRCalls {
             NFDRType: csvData.NFDRType || null
         };
 
-        Object.entries(NFDR_MAPPINGS).forEach(([csvField, dbField]) => {
+        Object.entries(NFDR_MAPPINGS).forEach(([csvField, dbField]) => { //get constant mapping of csv to db fields, loop through each field in csv
             // Skip fields we already set or that are not allowed
             if (dbField === 'Station_ID' || dbField === 'Observation_Time' || dbField === 'Fuel_Model') return;
             if (!ALLOWED_DB_FIELDS.has(dbField)) return; // Ignore unknown columns (like Station_Name)
@@ -180,7 +178,7 @@ export class NFDRCalls {
             }
             if (NFDR_NUMERIC_FIELDS.includes(dbField)) {
                 const numericValue = parseFloat(value);
-                dbRow[dbField] = isNaN(numericValue) ? null : numericValue;
+                dbRow[dbField] = isNaN(numericValue) ? null : numericValue; // Convert to number, set to null if conversion fails
             } else {
                 dbRow[dbField] = value; // For NFDRType (string)
             }

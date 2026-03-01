@@ -54,18 +54,18 @@ export const importService = { //group fetch, duplicate check, transform, and in
         }
         
         try {
-            // STEP 1: Get stations and mappings
+            // Get stations and mappings
             const nameToIdMap = await grabStations.nameToIdMap(supabase)
             console.log(`Found ${Object.keys(nameToIdMap).length} stations`)
             
-            // STEP 2: Get date range
+            // Get date range
             const { startDate, endDate } = getDateRange()
             console.log(`Fetching data from ${startDate} to ${endDate}`)
             
-            // STEP 3: Process NFDR data
+            // Process NFDR data
             results.nfdr = await this.previewNFDRData(nameToIdMap, startDate, endDate)
             
-            // STEP 4: Process Weather data
+            // Process Weather data
             results.weather = await this.processWeatherData(nameToIdMap, startDate, endDate)
             
             console.log('Import complete:', results)
@@ -76,6 +76,9 @@ export const importService = { //group fetch, duplicate check, transform, and in
             throw error
         }
     }, //separate object params (fx1, fx2) 
+
+
+
 
     async previewNFDRData(nameToIdMap, startDate, endDate) {
         
@@ -121,7 +124,7 @@ export const importService = { //group fetch, duplicate check, transform, and in
                 // Transform rows
                 const transformedRows = validRows.map(row => {
                     const transformed = NFDRCalls.transformNFDRData(row, nameToIdMap[row.StationName]) //outside call to transform to db format, add station id, and fuel model
-                    console.log('Transformed row sample:', transformed)
+                    //console.log('Transformed row sample:', transformed)
                     return transformed
                 })
                 
@@ -143,15 +146,19 @@ export const importService = { //group fetch, duplicate check, transform, and in
                 //filter duplicates, only keep new rows that dont have existing key combinations of stationId + date + fuelModel
                 const newForThisGroup = transformedRows.filter(row => {
                     const key = `${row.Station_ID}:${row.Observation_Time}:${row.Fuel_Model}`
-                    console.log(`  Checking key: ${key} - Exists: ${existingKeys.has(key)}`)
-                    const exists = existingKeys.has(key)
-                    if (exists) console.log(`  🔑 Key exists: ${key}`) //never hits
-                    return !exists //keep only if it does NOT exist in db
+                    //console.log(`  Checking key: ${key} - Exists: ${existingKeys.has(key)}`)
+                    if (existingKeys.has(key)) {
+                        // This is a duplicate - exclude it
+                        return false
+                    } else {
+                        // This is a new record - include it
+                        return true
+                    }
                 })
                 
-                console.log(`  New rows for this group: ${newForThisGroup.length}`)
+                console.log(`New rows for this group: ${newForThisGroup.length}`)
                 
-                newRows = [...newRows, ...newForThisGroup] //only new NFDR rows to be inserted, for reporting and immediate use
+                newRows = [...newRows, ...newForThisGroup] //only new NFDR rows to be inserted, for reporting  ...immediate use
 
                 duplicateCount += transformedRows.length - newForThisGroup.length //how many were dropped
                 if (newForThisGroup.length > 0) {
@@ -165,9 +172,8 @@ export const importService = { //group fetch, duplicate check, transform, and in
         }
         
         return {
-            rows: allRows,
-            newRows: newRows,
-            duplicates: duplicateCount,
+            success: true,
+            inserted: newRows.length,
             total: allRows.length
         }
     },
@@ -184,13 +190,13 @@ export const importService = { //group fetch, duplicate check, transform, and in
             const rows = parseCSV(csvText)
             
             // Filter valid rows and transform
-            const validRows = rows.filter(row => 
-                row.StationName && nameToIdMap[row.StationName] && row.Date
-            )
+            const validRows = rows.filter(row => row.StationName && nameToIdMap[row.StationName] && row.Date) //keep rows with station mapping and a valid date, drop others
+            console.log(`Valid weather rows: ${validRows.length} out of ${rows.length}`)
+            console.log('Sample valid weather row:', validRows[0])
             
-            const transformedRows = validRows.map(row => 
-                WeatherCalls.transformWeatherData(row, nameToIdMap[row.StationName])
-            )
+           //tranform rows to db headers 
+            const transformedRows = validRows.map(row => WeatherCalls.transformWeatherData(row, nameToIdMap[row.StationName]))
+            console.log('Sample transformed weather row:', transformedRows[0])
             
             if (transformedRows.length === 0) {
                 console.log(`No valid weather rows`)
@@ -198,22 +204,23 @@ export const importService = { //group fetch, duplicate check, transform, and in
             }
             
             // Check for duplicates
-            const uniqueStationIds = [...new Set(transformedRows.map(r => r.Station_ID))]
+            const uniqueStationIds = [...new Set(transformedRows.map(r => r.Station_ID))] //r=transformed row
             const dates = transformedRows.map(r => r.Observation_Time)
             
-            const existingKeys = await WeatherCalls.findExistingWeatherRecords(
-                supabase, uniqueStationIds, dates
-            )
+            const existingKeys = await WeatherCalls.findExistingWeatherRecords(uniqueStationIds, dates) //return existing dups
+            console.log(`Existing weather keys found:`, existingKeys.size)
+            console.log(`Sample existing weather key:`, [...existingKeys][0])
             
             // Filter duplicates
             const newRecords = transformedRows.filter(row => {
                 const key = `${row.Station_ID}:${row.Observation_Time}`
-                return !existingKeys.has(key)
+                return !existingKeys.has(key) //drop all dups
             })
+            console.log(`New weather records to insert: ${newRecords.length} out of ${rows.length}`)
             
             // Insert new records
             if (newRecords.length > 0) {
-                const result = await WeatherCalls.insertWeatherRecords(supabase, newRecords)
+                const result = await WeatherCalls.insertWeatherRecords(newRecords)
                 console.log(`Inserted ${result.count} new weather records (${rows.length} total processed)`)
                 return { success: true, inserted: result.count, total: rows.length }
             }

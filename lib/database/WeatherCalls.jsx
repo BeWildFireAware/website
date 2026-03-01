@@ -20,7 +20,7 @@ export class WeatherCalls {
             return new Set() //return empty set on error to prevent crash, will treat as no existing records
         }
         const existingDates = new Set()
-        data?.forEach(record => {
+        data?.forEach(record => { //if data exists, loop through and add stationID:date to set for easy lookup of existing records when filtering new data before insert
             const dateString = record.Observation_Time //expecting format '2026-01-20'
             existingDates.add(`${record.Station_ID}:${dateString}`) //add stationID:date to set for easy lookup
         })    
@@ -41,14 +41,15 @@ export class WeatherCalls {
     }
 
 
-    static async transformWeatherData(csvData, stationId) {
+    static transformWeatherData(csvData, stationId) {
         const dbRow = {
             Station_ID: stationId, //add station id to each record
             Observation_Time: convertDateByFormat(csvData.Date, 'MM/DD/YYYY'), //convert date format for db
-            Snow_Flag: csvData.DailySnowFlag === '1' ? true : false //convert to boolean
+            Snow_Flag: csvData.DailySnowFlag === '1' ? true : false, //convert to boolean
+            Observation_Type: csvData.OberservationType || 'O' //default to 'O' for observed if not provided
         }
         Object.entries(WEATHER_MAPPINGS).forEach(([csvField, dbField]) => {
-            if(dbField == 'Station_ID' || dbField == 'Observation_Time' || dbField == 'Snow_Flag') return //already mapped
+            if(dbField == 'Station_ID' || dbField == 'Observation_Time' || dbField == 'Snow_Flag' || dbField == 'Observation_Type') return //already mapped
 
             const value = csvData[csvField]
             if(value === undefined || value === null || value === '') {
