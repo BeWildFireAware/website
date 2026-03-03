@@ -4,6 +4,7 @@ import { grabStations } from '@/lib/database/getStations.jsx'
 import { NFDRCalls } from '@/lib/database/NFDRCalls.jsx'
 import { WeatherCalls } from '@/lib/database/WeatherCalls.jsx'
 import { getDateRange } from '@/lib/utils/formatDate.jsx'
+import { ForecastUpdate } from '@/lib/database/forecastUpdate.jsx'
 import {
     BASE_WEATHER_CSV_URL,
     BASE_NFDR_URL
@@ -92,6 +93,7 @@ export const importService = { //group fetch, duplicate check, transform, and in
         let allRows = [] //for reporting total rows processed 
         let newRows = [] //to track new rows that will be inserted, 
         let duplicateCount = 0
+        let updatedCount = 0 //forecast data that was updated to observed
         
         for (const [fuelModel, stationIds] of Object.entries(stationsByFuelModel)) {
             console.log(`\n Processing fuel model ${fuelModel} with stations:`, stationIds)
@@ -127,12 +129,18 @@ export const importService = { //group fetch, duplicate check, transform, and in
                     //console.log('Transformed row sample:', transformed)
                     return transformed
                 })
+
+                //CHECK OLD FORECAST FATA
+                const updateResults = await ForecastUpdate.updateObservedForecasts(transformedRows, 'NFDR') 
+                updatedCount += updateResults.updatedCount
+                const rowsToInsert = transformedRows.filter(r => !r.wasUpdated) //filter out rows that were updated to observed
+
                 
-                allRows = [...allRows, ...transformedRows] //all rows tranformed... to accumulate all rows for reporting total processed, turned into array for imeediate use
+                allRows = [...allRows, ...rowsToInsert] //all rows tranformed... to accumulate all rows for reporting total processed, turned into array for imeediate use
                 
                 // Check existing records
-                const stationIds_ = [...new Set(transformedRows.map(r => r.Station_ID))] //staionId exists elsewhere, prevent collision
-                const dates = transformedRows.map(r => r.Observation_Time)
+                const stationIds_ = [...new Set(rowsToInsert.map(r => r.Station_ID))] //staionId exists elsewhere, prevent collision
+                const dates = rowsToInsert.map(r => r.Observation_Time)
                 
                 console.log(`  Checking duplicates for stations:`, stationIds_)
                 
@@ -144,7 +152,7 @@ export const importService = { //group fetch, duplicate check, transform, and in
                 //console.log(`  Sample existing key:`, [...existingKeys][0])
                 
                 //filter duplicates, only keep new rows that dont have existing key combinations of stationId + date + fuelModel
-                const newForThisGroup = transformedRows.filter(row => {
+                const newForThisGroup = rowsToInsert.filter(row => {
                     const key = `${row.Station_ID}:${row.Observation_Time}:${row.Fuel_Model}`
                     //console.log(`  Checking key: ${key} - Exists: ${existingKeys.has(key)}`)
                     if (existingKeys.has(key)) {
@@ -160,9 +168,9 @@ export const importService = { //group fetch, duplicate check, transform, and in
                 
                 newRows = [...newRows, ...newForThisGroup] //only new NFDR rows to be inserted, for reporting  ...immediate use
 
-                duplicateCount += transformedRows.length - newForThisGroup.length //how many were dropped
+                duplicateCount += rowsToInsert.length - newForThisGroup.length //how many were dropped
                 if (newForThisGroup.length > 0) {
-                    NFDRCalls.insertNFDRRecords(supabase, newForThisGroup) //if records still, insert them
+                    await NFDRCalls.insertNFDRRecords(supabase, newForThisGroup) //if records still, insert them
                     console.log(`Inserted ${newForThisGroup.length} new NFDR records for fuel model ${fuelModel}`)
                 }
                 
@@ -174,7 +182,9 @@ export const importService = { //group fetch, duplicate check, transform, and in
         return {
             success: true,
             inserted: newRows.length,
-            total: allRows.length
+            total: allRows.length,
+            updated : updatedCount,
+            duplicates: duplicateCount
         }
     },
 
@@ -200,33 +210,41 @@ export const importService = { //group fetch, duplicate check, transform, and in
             
             if (transformedRows.length === 0) {
                 console.log(`No valid weather rows`)
-                return { success: true, inserted: 0, total: rows.length }
+                return { success: true, inserted: 0, total: rows.length, updated: 0, duplicates: 0 }
             }
+
+            //CHECK FOR OLD FORECAST DATA
+            const updateResults = await ForecastUpdate.updateObservedForecasts(transformedRows, 'Weather')
+            const updatedCount = updateResults.updatedCount
+
+            const rowsToInsert = transformedRows.filter(r => !r.wasUpdated) //filter out rows that were updated to observed, only insert new forecast records that were not updated to observed
+            
             
             // Check for duplicates
-            const uniqueStationIds = [...new Set(transformedRows.map(r => r.Station_ID))] //r=transformed row
-            const dates = transformedRows.map(r => r.Observation_Time)
+            const uniqueStationIds = [...new Set(rowsToInsert.map(r => r.Station_ID))] //r=transformed row
+            const dates = rowsToInsert.map(r => r.Observation_Time)
             
             const existingKeys = await WeatherCalls.findExistingWeatherRecords(uniqueStationIds, dates) //return existing dups
             console.log(`Existing weather keys found:`, existingKeys.size)
             console.log(`Sample existing weather key:`, [...existingKeys][0])
             
             // Filter duplicates
-            const newRecords = transformedRows.filter(row => {
+            const newRecords = rowsToInsert.filter(row => {
                 const key = `${row.Station_ID}:${row.Observation_Time}`
                 return !existingKeys.has(key) //drop all dups
             })
+            const duplicateCount = rowsToInsert.length - newRecords.length
             console.log(`New weather records to insert: ${newRecords.length} out of ${rows.length}`)
             
             // Insert new records
             if (newRecords.length > 0) {
                 const result = await WeatherCalls.insertWeatherRecords(newRecords)
                 console.log(`Inserted ${result.count} new weather records (${rows.length} total processed)`)
-                return { success: true, inserted: result.count, total: rows.length }
+                return { success: true, inserted: result.count, total: rows.length, updated: updateResults.updatedCount, duplicates: duplicateCount }
             }
             
             console.log(`No new weather records to insert (${rows.length} total processed)`)
-            return { success: true, inserted: 0, total: rows.length }
+            return { success: true, inserted: 0, total: rows.length, updated: updateResults.updatedCount, duplicates: duplicateCount }
             
         } catch (error) {
             console.error('Error processing weather data:', error)

@@ -46,8 +46,9 @@ export class WeatherCalls {
             Station_ID: stationId, //add station id to each record
             Observation_Time: convertDateByFormat(csvData.Date, 'MM/DD/YYYY'), //convert date format for db
             Snow_Flag: csvData.DailySnowFlag === '1' ? true : false, //convert to boolean
-            Observation_Type: csvData.OberservationType || 'O' //default to 'O' for observed if not provided
+            Observation_Type: csvData.ObservationType || 'O' //default to 'O' for observed if not provided
         }
+        
         Object.entries(WEATHER_MAPPINGS).forEach(([csvField, dbField]) => {
             if(dbField == 'Station_ID' || dbField == 'Observation_Time' || dbField == 'Snow_Flag' || dbField == 'Observation_Type') return //already mapped
 

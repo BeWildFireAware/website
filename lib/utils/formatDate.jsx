@@ -9,12 +9,17 @@ export function formattedDate(date) { //will need future refactor for forecast d
 }
 export function getDateRange(){ //return start and end date for csv query, ex: 2026-01-01 to 2026-01-31
     const today = new Date()
+
     //const firstOfMonth = new Date(today.getFullYear(), today.getMonth(), 1)
     const firstOfMonth = new Date(today)
     firstOfMonth.setDate(today.getDate() - 30) //get data for last 30 days, can adjust as needed
+
+    const endDate = new Date(today)
+    endDate.setDate(today.getDate() + 3) //3 days in the future for forecast data
     return {
         startDate: formattedDate(firstOfMonth),
-        endDate: formattedDate(today)
+        endDate: formattedDate(endDate),
+        today: formattedDate(today) //middle date for forcat->observed
     }
 }
 

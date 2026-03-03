@@ -154,6 +154,7 @@ export class NFDRCalls { //group of functons
             'OneHourFM', 'TenHourFM', 'HundredHourFM', 'ThousandHourFM',
             'IC', 'KBDI', 'SC', 'ERC', 'BI', 'NFDRType'
         ]);
+        
 
         // Set Fuel_Model with default
         let fuelModel = csvData.FuelModel || csvData.Fuel_Model || 'Y';
