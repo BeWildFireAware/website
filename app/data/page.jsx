@@ -1,3 +1,5 @@
+//Data Display Page (Will not be used in final build, mainly for troubleshooting)
+
 'use server'
 
 // Import Supabase client for database operations

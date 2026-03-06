@@ -1,3 +1,5 @@
+//Template Page
+
 'use client'
 
 import { useEffect, useState } from 'react'
@@ -9,6 +11,7 @@ export default function FdraPage() {
   const id = pathname?.split('/fdra/')[1]
   const [data, setData] = useState(null)
 
+  //Hard Coded Date for now - Will change
   const todayStr = '2026-03-01'
 
   useEffect(() => {

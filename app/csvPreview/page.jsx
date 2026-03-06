@@ -1,3 +1,5 @@
+//Acts as the daily import for now
+
 import { buildCsvStoreData } from '../components/fetchData'
 import { supabase } from '@/lib/supabase'
 import { redirect } from 'next/navigation'

@@ -1,3 +1,5 @@
+//Map Placeholder
+
 import MapEmbedV1 from '../components/map_comp/mapEmbedv1';
 export default function MapPage() { 
     return (
