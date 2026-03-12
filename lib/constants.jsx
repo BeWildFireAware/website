@@ -2,6 +2,8 @@
 export const BASE_WEATHER_CSV_URL = 'https://fems.fs2c.usda.gov/api/climatology/download-wx-daily-summary/?dataset=all'
 export const BASE_NFDR_URL = 'https://fems.fs2c.usda.gov/api/ext-climatology/download-nfdr-daily-summary/?dataset=all'
 
+
+
 //column mappings from csv to db
 export const NFDR_MAPPINGS = {  
     'BI': 'BI',
