@@ -7,7 +7,7 @@ trigger db edge fx after confirmation
 import { fetchNFDRData } from '../../lib/NFDRApi.js'
 import { fetchWeatherData } from '../../lib/weatherApi.js'
 import { supabase } from '../../lib/supabase/server.js'
-import { parse } from 'node:path';
+
 
 export async function stationSearch(formData) {
 
@@ -43,7 +43,7 @@ export async function stationSearch(formData) {
             .eq('ID', stationId)
             .single(); //should only be one station with given id, if any
 
-        if(stationfetchError) {
+        if(stationfetchError && stationfetchError.code !== 'PGRST116') { // PGRST116 = no rows returned
             console.error('Error checking existing station:', stationfetchError);
             return { error: 'Failed to check existing stations' }
         }
@@ -54,158 +54,77 @@ export async function stationSearch(formData) {
         
         console.log(`fetching nfdr data for station ${stationId} with fuel model ${fuelModel}`); //debug log
 
-        //get api data
+        //get api data - allow partial failures
         let nfdrData = []; //local variable to hold data from fetch
         let weatherData = [];
+        let nfdrError = null;
+        let weatherError = null;
+        
         try {
             nfdrData = await fetchNFDRData(stationId, fuelModel);
-            console.log(`NFDR data fetched for station ${stationId}:`, nfdrData); //debug log
-        } catch (nfdrError) {
-            console.error(`Error fetching NFDR data for station ${stationId}:`, nfdrError);
-            return { error: 'Failed to fetch NFDR data for the station' }
+            console.log(`NFDR data fetched for station ${stationId}:`, nfdrData.length, 'records'); //debug log
+        } catch (err) {
+            console.error(`Error fetching NFDR data for station ${stationId}:`, err);
+            nfdrError = err.message;
+            // Don't return yet - try to get weather data
         }
+        
         console.log(`fetching weather data for station ${stationId}`); //debug log
         try{
             weatherData = await fetchWeatherData(stationId);
-            console.log(`Weather data fetched for station ${stationId}:`, weatherData); //debug log
-        } catch (weatherError) {
-            console.error(`Error fetching weather data for station ${stationId}:`, weatherError);
-            return { error: 'Failed to fetch weather data for the station' }
+            console.log(`Weather data fetched for station ${stationId}:`, weatherData.length, 'records'); //debug log
+        } catch (err) {
+            console.error(`Error fetching weather data for station ${stationId}:`, err);
+            weatherError = err.message;
         }
 
-        if(nfdrData.length === 0 && weatherData.length === 0) { //should always return data for both apis, if not something went wrong (will there ever be a case without nfdr/weather data?)
-            return { error: 'No data found for the specified station, please make sure the ID is correct' }
+        // Check if we got ANY data
+        if(nfdrData.length === 0 && weatherData.length === 0) {
+            const errorDetails = [];
+            if (nfdrError) errorDetails.push(`NFDR: ${nfdrError}`);
+            if (weatherError) errorDetails.push(`Weather: ${weatherError}`);
+            return { 
+                error: `No data found for station ${stationId}. ${errorDetails.join('; ')}` 
+            };
         }
 
-        //valid api adta
+        //valid api data
         //transform for preview
-        const stationName = nfdrData[0]?.StationName || weatherData[0]?.StationName || stationId; //try to get station name from either source, default to id if not available(should never happen)
+        const stationName = nfdrData[0]?.StationName || weatherData[0]?.StationName || stationId;
 
-        const preview = { //obj to hold header value for both nfdr and weater for one preview record
+        const preview = {
             stationName: stationName,
             stationId: stationId,
-
+            // Fix: Use consistent property name 'nfdrSample' (not 'nfdrSamples')
             nfdrSample: nfdrData.slice(0,3).map(record => ({ 
-                observationTime: record.ObservationTime || record.Date || 'None', //some records(nfdr/weather) have ObservationTime, some have Date, use whatever is available in case they ever switch
-                erc: record.ERC ? parseFloat(record.ERC) : 'None', //parse to float if available, otherwise return 'None'
-                bi: record.BI ? parseFloat(record.BI) : 'None',
+                observationTime: record.ObservationTime || record.Date || 'None',
+                erc: record.ERC ? parseFloat(record.ERC) : null,
+                bi: record.BI ? parseFloat(record.BI) : null,
                 nfdrType: record.NFDRType || 'None'
             })),
-            weatherSamples: weatherData.slice(0,3).map(record => ({
+            // Fix: Use 'record' not 'row' in the map
+            weatherSample: weatherData.slice(0,3).map(record => ({
                 date: record.Date || record.ObservationTime || 'None',
-                tempMin: row['TemperatureMin(F)'] ? parseFloat(row['TemperatureMin(F)']) : 'null',
-                tempMax: row['TemperatureMax(F)'] ? parseFloat(row['TemperatureMax(F)']) : 'null',
-                precipitation: row['Precipitation24hr(In)'] ? parseFloat(row['Precipitation24hr(In)']) : 'null',
+                tempMin: record['TemperatureMin(F)'] ? parseFloat(record['TemperatureMin(F)']) : null,
+                tempMax: record['TemperatureMax(F)'] ? parseFloat(record['TemperatureMax(F)']) : null,
+                precipitation: record['Precipitation24hr(in)'] ? parseFloat(record['Precipitation24hr(in)']) : null,
             })),
-            //check if it received the correct amount of rows
             stats: {
                 nfdrRecords: nfdrData.length,
-                weatherRecords: weatherData.length
+                weatherRecords: weatherData.length,
+                hasNfdr: nfdrData.length > 0,
+                hasWeather: weatherData.length > 0
             }
         }
         console.log(`Preview data prepared for station ${stationId}`); //debug log
-        return { success: true, exists: false,preview: preview, message: `Preview data prepared for station ${stationId}` } //return preview data for user confirmation before adding to db
+        return { 
+            success: true, 
+            exists: false,
+            preview: preview, 
+            message: `Preview data prepared for station ${stationId}` 
+        }
     } catch(error) {
         console.error('Error during station search process:', error);
         return { error: 'An unexpected error occurred during the station search process' }
     }
-
-   
 }
-
-
-
-
-
-
-
-
-
-/* // Extract data from form
-    const stationId = formData.get('stationId')
-    const fdraId = formData.get('fdraId')
-    
-    // Validate inputs
-    if (!stationId || stationId.trim() === '') {
-        return { found: false, error: 'Station ID is required' }
-    }
-    
-    if (!fdraId || fdraId.trim() === '') {
-        return { found: false, error: 'Please select an FDRA' }
-    }
-
-    const baseurl = 'https://fems.fs2c.usda.gov/api/ext-climatology/download-nfdr-daily-summary/';
-
-    // Get date range - last 3 days of data
-    const today = new Date();
-    const threeDaysAgo = new Date(today);
-    threeDaysAgo.setDate(today.getDate() - 0); // Get dat
-
-    // Format dates (YYYY-MM-DD)
-    const threeDaysAgoStr = threeDaysAgo.toISOString().split('T')[0];
-    const todayStr = today.toISOString().split('T')[0];
-
-    // Construct URL
-    const url = `${baseurl}?dataset=all&startDate=${threeDaysAgoStr}&endDate=${todayStr}&dataFormat=csv&stationIds=${stationId}`;
-    
-    console.log('Fetching URL:', url); // Debug log
-    
-    try {
-        // Fetch data
-        const response = await fetch(url);
-        
-        if (!response.ok) {
-            return { 
-                found: false, 
-                error: `Station search failed: ${response.status} ${response.statusText}` 
-            };
-        }
-        
-        const csvText = await response.text();
-        const lines = csvText.trim().split('\n');
-        
-        if (lines.length < 2) {
-            return { 
-                found: false, 
-                message: `No data found for Station ID ${stationId}` 
-            };
-        }
-
-        // Parse headers (first line)
-        const headers = lines[0].split(',').map(col => col.replace(/"/g, '').trim());
-        
-        // Parse data rows
-        const rows = lines.slice(1).map(line => {
-            const values = line.split(',').map(val => val.replace(/"/g, '').trim());
-            const row = {};
-            headers.forEach((header, index) => {
-                row[header] = values[index] || '';
-            });
-            return row;
-        });
-
-        // Get the most recent record (first row)
-        const latestRecord = rows[0] || {};
-
-        // Return structured data
-        return { 
-            found: true, 
-            data: {
-                stationId: stationId,
-                fdraId: fdraId,
-                stationName: latestRecord.StationName || '',
-                erc: latestRecord.ERC || '',
-                bi: latestRecord.BI || '',
-                observationTime: latestRecord.ObservationTime || latestRecord.Date || '',
-                nfdrType: latestRecord.NFDRType || '',
-                sampleData: rows.slice(0, 3) // First 3 records for preview
-            }
-        };
-        
-    } catch (error) {
-        console.error('Station search error:', error);
-        return { 
-            found: false, 
-            error: error.message || 'Unknown error occurred' 
-        };
-    }*/ 

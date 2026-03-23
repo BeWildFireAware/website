@@ -1,6 +1,6 @@
 //page to get user input for new stations to add to db
 
-import { stationSearchForm } from './components/newStationAdd/stationSearchForm.jsx'
+import  StationSearchForm  from '../components/newStationAdd/stationSearchForm.jsx'
 
 export default function AddDataPage() {
     return (
@@ -8,7 +8,7 @@ export default function AddDataPage() {
             <div className="add-station-section">
                 <h2>Add New Station</h2>
                 <p>Enter the new station ID, fuel model, and fdra it belongs to</p>
-                {stationSearchForm()}
+                <StationSearchForm />
             </div>
             <div>
                 <h2>Add New FDRA</h2>

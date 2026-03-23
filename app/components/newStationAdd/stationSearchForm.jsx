@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react'
 import StationPreview from './previewStation.jsx'
 
 
-export default function stationSearchForm() {
+export default function StationSearchForm() {
     const [stationId, setStationId] = useState('');
     const [fuelModel, setFuelModel] = useState('Y'); //default Y (most common currently)
     const [fdraId, setFdraId] = useState('');
@@ -20,7 +20,7 @@ export default function stationSearchForm() {
         async function fetchFdraOptions() {
             try {
                 // vetch server action for all fdras
-                const response = await fetch('/api/fdraOptions');
+                const response = await fetch('/api/fdra/options');
                 const data = await response.json();
                 setFdraOptions(data);
             } catch (error) {
@@ -54,8 +54,8 @@ export default function stationSearchForm() {
             const result = await stationSearch(formData);
             if(result.error) {
                 setError(result.error);
-            } else if(result.found) {
-                setSearchResult({ message: `Station ${stationId} found in NFDR`, exists: true}); //return already exists
+            } else if(result.exists) {
+                setSearchResult({ message: `Station ${stationId} found in Database`, exists: true}); //return already exists
                 
             }else if (result.preview) {
                 setPreviewData(result.preview); //return preview data for user confirmation before adding to db
@@ -105,8 +105,8 @@ export default function stationSearchForm() {
                 >
                     <option value="">Select an FDRA</option>
                     {fdraOptions.map(fdra => (
-                        <option key={fdra.id} value={fdra.id}> 
-                            {fdra.name}
+                        <option key={fdra.FDRA_ID} value={fdra.FDRA_ID}> 
+                            {fdra.FDRAname}
                         </option>
                     ))}
                 </select>
