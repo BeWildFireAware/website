@@ -19,7 +19,8 @@ export default function StationSearchForm() {
     const [error, setError] = useState('');
     const [previewData, setPreviewData] = useState(null); //hold data preview for user confirmation before adding to db
     const [fdraOptions, setFdraOptions] = useState([]); //get fdra options from db to populate dropdown, set on page load with useEffect
-    
+    const [confirmMessage, setConfirmMessage] = useState(''); //message to user on succes or failure to add to db
+
     //get current fdra options to select from
     useEffect(() => {
         async function fetchFdraOptions() {
@@ -51,6 +52,7 @@ export default function StationSearchForm() {
         setIsLoading(true); //show loading state 
         setSearchResult(null);
         setPreviewData(null); //clear previous data on new searches
+        setConfirmMessage(''); //clear previous messages on new searches
         try {
             const formData = new FormData();
             formData.append('stationId', stationId);
@@ -80,6 +82,7 @@ export default function StationSearchForm() {
         console.log('User confirmed station add with info:', stationInfo);
         setIsAdding(true); //show adding state after user confirms preview, while waiting for edge fx
         setError(''); //clear any previous errors
+        setConfirmMessage(''); //clear any previous messages
         try{
             const result = await addStationToDatabase ({
                 stationId: stationInfo.stationId,
@@ -90,8 +93,9 @@ export default function StationSearchForm() {
             console.log('Result from addStationToDatabase:', result);
             if(result.error) {
                 setError(result.error);
+                setConfirmMessage('Error on adding station'); //clear success message on error
             } 
-            else 
+            else if(result.success)
             {
                 setPreviewData(null); //clear preview on successful add
                 setStationId(''); //clear form on successful add
@@ -99,10 +103,12 @@ export default function StationSearchForm() {
                 setFdraId('');
                 setSearchResult(null);
                 setError(''); //clear any previous errors
+                setConfirmMessage('Station added successfully!'); //show success message
             }
             
         }catch(error){
             setError(error.message || 'An error occurred while adding the station to the database');
+            setConfirmMessage('Error on adding station'); 
         } 
         finally {
             setIsAdding(false); //adding complete
@@ -113,6 +119,7 @@ export default function StationSearchForm() {
         setPreviewData(null); //clear preview and return to search form for new search
         setSearchResult(null);
         setError("");
+        setConfirmMessage(''); 
     };
     return (
         <div className="station-search-container">
@@ -190,6 +197,11 @@ export default function StationSearchForm() {
                 <p>Adding station to database...</p>
             </div>
         )} 
+        {confirmMessage && (
+            <div className="confirm-message">
+                <p>{confirmMessage}</p>
+            </div>
+        )}
         </div>
     );
 
