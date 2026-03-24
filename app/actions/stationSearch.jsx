@@ -7,6 +7,7 @@ trigger db edge fx after confirmation
 import { fetchNFDRData } from '../../lib/NFDRApi.js'
 import { fetchWeatherData } from '../../lib/weatherApi.js'
 import { supabase } from '../../lib/supabase/server.js'
+import { exists } from 'node:fs';
 
 
 export async function stationSearch(formData) {
@@ -77,42 +78,55 @@ export async function stationSearch(formData) {
             console.error(`Error fetching weather data for station ${stationId}:`, err);
             weatherError = err.message;
         }
-
+        console.log(`Data fetch complete for station ${stationId}. NFDR records: ${nfdrData.length}, Weather records: ${weatherData.length}`); //debug log
         // Check if we got ANY data
-        if(nfdrData.length === 0 && weatherData.length === 0) {
+        if(nfdrData.length === 1 && weatherData.length === 1) {
             const errorDetails = [];
             if (nfdrError) errorDetails.push(`NFDR: ${nfdrError}`);
             if (weatherError) errorDetails.push(`Weather: ${weatherError}`);
             return { 
-                error: `No data found for station ${stationId}. ${errorDetails.join('; ')}` 
+                error: `No data found for station ${stationId}. ${errorDetails.join('; ')}`,
+                exists: false,
+                preview: null
+                 
             };
         }
 
         //valid api data
         //transform for preview
         const stationName = nfdrData[0]?.StationName || weatherData[0]?.StationName || stationId;
+        //if no name(no data) return error
+        if (stationName === stationId && nfdrData.length === 1 && weatherData.length === 1) {
+            return { 
+                error: `No data found for station ${stationId}. Please verify the station ID is correct.`,
+                exists: false,
+                preview: null
+            };
+        }
 
         const preview = {
             stationName: stationName,
             stationId: stationId,
-            // Fix: Use consistent property name 'nfdrSample' (not 'nfdrSamples')
-            nfdrSample: nfdrData.slice(0,3).map(record => ({ 
+            // get data to preview, all rows pulled (should be 4)
+
+            nfdrSample: nfdrData.map(record => ({ 
                 observationTime: record.ObservationTime || record.Date || 'None',
                 erc: record.ERC ? parseFloat(record.ERC) : null,
                 bi: record.BI ? parseFloat(record.BI) : null,
                 nfdrType: record.NFDRType || 'None'
             })),
-            // Fix: Use 'record' not 'row' in the map
-            weatherSample: weatherData.slice(0,3).map(record => ({
+            
+            weatherSample: weatherData.map(record => ({
                 date: record.Date || record.ObservationTime || 'None',
                 tempMin: record['TemperatureMin(F)'] ? parseFloat(record['TemperatureMin(F)']) : null,
                 tempMax: record['TemperatureMax(F)'] ? parseFloat(record['TemperatureMax(F)']) : null,
                 precipitation: record['Precipitation24hr(in)'] ? parseFloat(record['Precipitation24hr(in)']) : null,
             })),
+            //stats to show, help with debugging
             stats: {
                 nfdrRecords: nfdrData.length,
                 weatherRecords: weatherData.length,
-                hasNfdr: nfdrData.length > 0,
+                hasNfdr: nfdrData.length > 0, //true or false for debug
                 hasWeather: weatherData.length > 0
             }
         }
@@ -127,4 +141,4 @@ export async function stationSearch(formData) {
         console.error('Error during station search process:', error);
         return { error: 'An unexpected error occurred during the station search process' }
     }
-}
+}  

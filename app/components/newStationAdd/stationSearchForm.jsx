@@ -3,13 +3,18 @@
 import { stationSearch } from '../../actions/stationSearch.jsx'
 import { useState, useEffect } from 'react'
 import StationPreview from './previewStation.jsx'
+import { addStationToDatabase } from '../../actions/addStation.jsx'
+import { set } from 'date-fns'
+
 
 
 export default function StationSearchForm() {
+    //state variables for form input loading state, data
     const [stationId, setStationId] = useState('');
     const [fuelModel, setFuelModel] = useState('Y'); //default Y (most common currently)
     const [fdraId, setFdraId] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [isAdding, setIsAdding] = useState(false); //loading state for adding station to database after preview confirmation
     const [searchResult, setSearchResult] = useState(null);
     const [error, setError] = useState('');
     const [previewData, setPreviewData] = useState(null); //hold data preview for user confirmation before adding to db
@@ -43,9 +48,9 @@ export default function StationSearchForm() {
             return;
         }
         setError('');
-        setIsLoading(true);
+        setIsLoading(true); //show loading state 
         setSearchResult(null);
-        setPreviewData(null);
+        setPreviewData(null); //clear previous data on new searches
         try {
             const formData = new FormData();
             formData.append('stationId', stationId);
@@ -54,6 +59,7 @@ export default function StationSearchForm() {
             const result = await stationSearch(formData);
             if(result.error) {
                 setError(result.error);
+                setPreviewData(null); //no data on error
             } else if(result.exists) {
                 setSearchResult({ message: `Station ${stationId} found in Database`, exists: true}); //return already exists
                 
@@ -66,9 +72,48 @@ export default function StationSearchForm() {
             setError('An error occurred while searching for the station');
             console.error('Station search error:', err);
         } finally {
-            setIsLoading(false);
+            setIsLoading(false); //stop loading after any result
         }
+
     } 
+    const handleConfirm = async (stationInfo) => {
+        console.log('User confirmed station add with info:', stationInfo);
+        setIsAdding(true); //show adding state after user confirms preview, while waiting for edge fx
+        setError(''); //clear any previous errors
+        try{
+            const result = await addStationToDatabase ({
+                stationId: stationInfo.stationId,
+                fuelModel: stationInfo.fuelModel,
+                fdraId: stationInfo.fdraId,
+                stationName: stationInfo.stationData.stationName
+            });
+            console.log('Result from addStationToDatabase:', result);
+            if(result.error) {
+                setError(result.error);
+            } 
+            else 
+            {
+                setPreviewData(null); //clear preview on successful add
+                setStationId(''); //clear form on successful add
+                setFuelModel('Y'); //reset to default
+                setFdraId('');
+                setSearchResult(null);
+                setError(''); //clear any previous errors
+            }
+            
+        }catch(error){
+            setError(error.message || 'An error occurred while adding the station to the database');
+        } 
+        finally {
+            setIsAdding(false); //adding complete
+        }   
+    };
+
+    const handleDeny = () => {
+        setPreviewData(null); //clear preview and return to search form for new search
+        setSearchResult(null);
+        setError("");
+    };
     return (
         <div className="station-search-container">
         <form onSubmit={handleSubmit} className="station-search-form">
@@ -111,7 +156,7 @@ export default function StationSearchForm() {
                     ))}
                 </select>
             </div>
-            <button type="submit" disabled={isLoading}>
+            <button type="submit" disabled={isLoading || isAdding}>
                 {isLoading ? 'Searching...' : 'Search Station'}
             </button>
         </form> 
@@ -127,7 +172,7 @@ export default function StationSearchForm() {
             <div className="station-search-result">
                 <p>{searchResult.message}</p>
             </div>
-        )}; 
+        )} 
         {/*react components must be capitalized*/}
         {previewData && (     
             <StationPreview 
@@ -135,8 +180,16 @@ export default function StationSearchForm() {
             stationId={stationId}
             fuelModel={fuelModel}
             fdraId={fdraId}
+            onConfirm={handleConfirm}
+            onDeny={handleDeny}
              /> 
-        )}   
+        )}  
+
+        {isAdding && (
+            <div className="adding-station">
+                <p>Adding station to database...</p>
+            </div>
+        )} 
         </div>
     );
 
