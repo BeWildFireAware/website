@@ -681,3 +681,66 @@ p {
     font-size: 0.9rem;
   }
 }
+
+/* ================= ADMIN ================= */
+.Auth-form-container {
+  padding: 30px;
+  border-radius: 12px;
+  width: 320px;
+  
+}
+
+.Auth-form-title {
+  text-align: center;
+  font-size: larger;
+  color: black;
+  background-color: white;
+}
+
+
+.Auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  background-color: white;
+  padding: 20px;
+}
+
+.Login-form input {
+  padding: 10px;
+  border: 1px solid red;
+  border-radius: 4px;
+  color: #000;
+}
+
+.Login-form button {
+  padding: 10px;
+  background-color: red;
+  color: white;
+  border: none;
+  border-radius: 4px;
+}
+
+.Login-form button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.Login-form button:hover:not(:disabled) {
+  background-color: #ff6600;
+}
+
+.error-message {
+  background-color: red;
+  border: 1px solid black;
+  border-radius: 5px;
+  padding: 10px;
+}
+
+.success-message {
+  color: black;
+  background-color: #d1fae5;
+  border: 1px solid #86efac;
+  border-radius: 5px;
+  padding: 10px;
+}

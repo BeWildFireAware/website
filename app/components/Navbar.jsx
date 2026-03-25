@@ -20,6 +20,9 @@ export default function Navbar() {
           <li>
             <Link href="/about">About Me</Link>
           </li>
+          <li>
+            <Link href="/auth">Log In</Link>
+          </li>
         </ul>
       </div>
     </nav>
