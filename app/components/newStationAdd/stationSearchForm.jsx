@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react'
 import StationPreview from './previewStation.jsx'
 import { addStationToDatabase } from '../../actions/addStation.jsx'
 import { set } from 'date-fns'
-
+import { useRefresh } from '../contexts/refreshContext.jsx';
 
 
 export default function StationSearchForm() {
@@ -21,6 +21,9 @@ export default function StationSearchForm() {
     const [fdraOptions, setFdraOptions] = useState([]); //get fdra options from db to populate dropdown, set on page load with useEffect
     const [confirmMessage, setConfirmMessage] = useState(''); //message to user on succes or failure to add to db
 
+    //for entire page refresh on new data
+    const {refreshFlag, triggerRefresh} = useRefresh(); //returns obj not array
+
     //get current fdra options to select from
     useEffect(() => {
         async function fetchFdraOptions() {
@@ -28,14 +31,21 @@ export default function StationSearchForm() {
                 // vetch server action for all fdras
                 const response = await fetch('/api/fdra/options');
                 const data = await response.json();
-                setFdraOptions(data);
+                if(Array.isArray(data)) {
+                    setFdraOptions(data);
+                }else{
+                    console.error('Unexpected FDRA options format:', data);
+                    setFdraOptions([]);
+                }
+                
             } catch (error) {
                 console.error('Error fetching FDRA options:', error);
+                setFdraOptions([]);
             }
         }
 
         fetchFdraOptions(); //call the fx save data to array
-    }, []);
+    }, [refreshFlag]);
 
     async function handleSubmit(event) {
         event.preventDefault();
@@ -104,6 +114,9 @@ export default function StationSearchForm() {
                 setSearchResult(null);
                 setError(''); //clear any previous errors
                 setConfirmMessage('Station added successfully!'); //show success message
+                triggerRefresh();
+
+                setTimeout(() => setConfirmMessage(''), 5000); //clear success message after 5 seconds
             }
             
         }catch(error){

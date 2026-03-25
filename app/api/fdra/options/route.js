@@ -13,9 +13,9 @@ export async function GET() {
         if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
             console.error('FDRA API: Missing environment variables');
             return new Response(
-                JSON.stringify({ error: 'Missing Supabase configuration' }),
+                JSON.stringify([]),
                 { 
-                    status: 500,
+                    status: 200,
                     headers: { 'Content-Type': 'application/json' }
                 }
             );
@@ -30,15 +30,16 @@ export async function GET() {
         
         const { data, error } = await supabase
             .from('FDRA')
-            .select('*')  // Select all to see what columns exist
+            .select('FDRA_ID, FDRAname')  // Select all to see what columns exist
+            .order('FDRAname')
             
 
         if (error) {
             console.error('FDRA API: Database error:', error);
             return new Response(
-                JSON.stringify({ error: 'Database error', details: error.message }),
+                JSON.stringify([]),
                 { 
-                    status: 500,
+                    status: 200,
                     headers: { 'Content-Type': 'application/json' }
                 }
             );
@@ -59,9 +60,9 @@ export async function GET() {
     } catch (error) {
         console.error('FDRA API: Unexpected error:', error);
         return new Response(
-            JSON.stringify({ error: 'Internal server error', details: error.message }),
+            JSON.stringify([]),
             { 
-                status: 500,
+                status: 200,
                 headers: { 'Content-Type': 'application/json' }
             }
         );

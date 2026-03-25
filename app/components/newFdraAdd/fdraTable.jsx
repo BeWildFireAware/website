@@ -1,11 +1,14 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { deleteFdra } from '../../actions/fdraActions';
+import { useRefresh } from '../contexts/refreshContext.jsx'; //for delete
 //table for fdras and relationships
+
 
 export default function FdraTable({ fdras, dispatchAreas, onRefresh }) {
     const [deletingId, setDeletingId] = useState(null); // Track which FDRA is being deleted
     const [delError, setDelError] = useState('');
+    const { refreshFlag, triggerRefresh } = useRefresh(); // For refreshing after deletion
 
     //fx to get name-id values
     const getDispatchAreaName = (dispatchId) => {
@@ -40,6 +43,7 @@ export default function FdraTable({ fdras, dispatchAreas, onRefresh }) {
             const result = await deleteFdra(fdraId);
             if (result.success) {
                 onRefresh(); // Refresh the table after deletion
+                triggerRefresh(); // Refresh the entire page to update data across components
             } else {
                 setDelError(result.error || 'Failed to delete FDRA');
 

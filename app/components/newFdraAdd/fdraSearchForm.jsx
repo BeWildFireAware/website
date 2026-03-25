@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { addFdra, getDispatchAreas, getFdras } from '@/app/actions/fdraActions';
 import FdraTable from './fdraTable'; //in current dir
+import { useRefresh } from '../contexts/refreshContext.jsx';
+import { refresh } from 'next/cache';
 
 //create form for user to add, also display table of existing relationships
 
@@ -19,6 +21,9 @@ export default function FdraSearchForm() {
     const [isLoading, setIsLoading] = useState(false); //loading state for form submission
     const [isRefreshing, setIsRefreshing] = useState(false); //on table refresh
 
+    //entire page refresh on new data
+    const {refreshFlag, triggerRefresh} = useRefresh(); //obj not array
+
     // Fetch Dispatch Areas (for dropdown), name only in dispatch areas not fdras
     useEffect(() => {
         async function fetchDispatchAreas() {
@@ -33,7 +38,7 @@ export default function FdraSearchForm() {
             }
         }
         fetchDispatchAreas();
-    }, []);
+    }, [refreshFlag]); // Refresh when refreshFlag changes
 
     // Fetch FDRAs for table display, refresh
     const refreshFdras = async () => {
@@ -49,7 +54,7 @@ export default function FdraSearchForm() {
 
     useEffect(() => {
         refreshFdras();
-    }, []);
+    }, [refreshFlag]); // Refresh when refreshFlag changes
 
     // Handle form submission to add new FDRA
     async function handleSubmit(e) {
@@ -93,6 +98,8 @@ export default function FdraSearchForm() {
                 // Clear form
                 setFdraName('');
                 setDispatchAreaId('');
+
+                triggerRefresh(); // Refresh the entire page to update data across components
 
                 // Refresh the table
                 refreshFdras();
