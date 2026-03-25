@@ -1,7 +1,8 @@
 //page to get user input for new stations to add to db
 
 import  StationSearchForm  from '../components/newStationAdd/stationSearchForm.jsx'
-
+import FDRASearchForm from '../components/newFdraAdd/fdraSearchForm.jsx'
+import DispatchAreaSearchForm from '../components/newDispatchAreaAdd/dispatchAreaSearchForm.jsx'
 export default function AddDataPage() {
     return (
         <div className="add-data-page">
@@ -13,10 +14,12 @@ export default function AddDataPage() {
             <div>
                 <h2>Add New FDRA</h2>
                 <p>Enter the new FDRA name and dispatch area it belongs to</p>
+                <FDRASearchForm />
             </div>
             <div>
                 <h2>Add New Dispatch Area</h2>
                 <p>Enter the new dispatch area name</p>
+                
             </div>
         </div>
     );
