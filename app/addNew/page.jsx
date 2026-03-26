@@ -2,7 +2,8 @@
 import { RefreshProvider } from '../components/contexts/refreshContext.jsx';
 import  StationSearchForm  from '../components/newStationAdd/stationSearchForm.jsx'
 import FDRASearchForm from '../components/newFdraAdd/fdraSearchForm.jsx'
-import DispatchAreaSearchForm from '../components/newDispatchAreaAdd/dispatchAreaSearchForm.jsx'
+import DispatchAreaSearchForm from '@/app/components/newDispatchAreaAdd/dispatchAreaSearchForm.jsx'
+import DispatchAreaTable from '@/app/components/newDispatchAreaAdd/dispatchAreaTable.jsx'
 import  StationTable  from '../components/newStationAdd/stationTable.jsx'; //table to show all stations and their info, also allows for changing fdra assignment of stations
 
 export default function AddDataPage() {
@@ -28,7 +29,11 @@ export default function AddDataPage() {
                 <div>
                     <h2>Add New Dispatch Area</h2>
                     <p>Enter the new dispatch area name</p>
-                    
+                    <DispatchAreaSearchForm/>
+                </div>
+                <div>
+                    <h2>All Dispatch Areas</h2>
+                    <DispatchAreaTable/>
                 </div>
             </div>
         </RefreshProvider>

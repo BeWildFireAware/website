@@ -28,7 +28,7 @@ export default function StationSearchForm() {
     useEffect(() => {
         async function fetchFdraOptions() {
             try {
-                // vetch server action for all fdras
+                // vetch server action for all fdras(get request)
                 const response = await fetch('/api/fdra/options');
                 const data = await response.json();
                 if(Array.isArray(data)) {
