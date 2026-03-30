@@ -29,7 +29,6 @@ export default async function RootLayout({ children }) {
           <Link href="/learn-more"> Learn More</Link>
           <Link href="/csvPreview"> CSV Preview</Link>
           <Link href="/map"> View Map</Link>
-          <Link href="/auth"> Log In</Link>
           <DropDownClient dispatchData={data} />
         </nav>
         
@@ -42,7 +41,8 @@ export default async function RootLayout({ children }) {
           <Link href="/about"> Who We Are</Link>
           <Link href="/data"> Data</Link>
           <Link href="/learn-more"> Learn More</Link>
-          <Link href="/auth"> Log In</Link>
+          <Link href="/auth/logIn"> Log In</Link>
+          
         </nav>
           
         

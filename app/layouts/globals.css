@@ -441,8 +441,8 @@ p {
 .contact-info {
   text-align: center;
   padding: 20px;
-  background-color: #0B3D12; /* Same as page container */
-  color: white;
+  background-color: orange; /* Same as page container */
+  color: black;
   margin: 0;
 }
 
