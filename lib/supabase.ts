@@ -1,3 +1,4 @@
+//NEED TO RENAME TO CLIENT, may not use much in future, anon key doesnt pass RLS, and this will run in broswer
 import { createClient } from '@supabase/supabase-js'
 
 
