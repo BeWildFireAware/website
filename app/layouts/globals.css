@@ -744,3 +744,38 @@ p {
   border-radius: 5px;
   padding: 10px;
 }
+
+.radio-signUp {
+  color: black
+}
+
+.userTable{
+  min-width: 100%;
+  background-color: #f9fafb;
+  border: 1px solid #d1d5db;
+}
+
+.userTable thead {
+  background-color: #e5e7eb; /* gray-200 */
+}
+
+.userTable th {
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  text-align: left;
+  color: black;
+  font-weight: 600;
+}
+
+.userTable td {
+  padding: 0.5rem 1rem;
+  border: 1px solid #d1d5db;
+  color: black;
+}
+
+.adminDash{
+  display: 'flex';
+  gap: '10px';
+  flex-wrap: 'wrap';
+  margin-top: '10px'
+}

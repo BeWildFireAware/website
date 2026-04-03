@@ -1,5 +1,10 @@
 'use client';
-
+//can only be accessed by ADMIN users
+//this page handles signing up users 
+//need email (checked by supabase)
+//need display name
+//need to set admin role type
+//need password and need to confirm (automatically hashed and secured by supabase)
 
 import { supabase } from '@/lib/supabase';
 import { useState,useEffect } from 'react';
@@ -10,26 +15,27 @@ import Link from 'next/link';
 
 
 
-export default function AuthForm() {
-    //const [isLogin, setIsLogin] = useState(true); // true = login, false = signup
+export default function SignUpForm() {
+    //const [isLogin, setIsLogin] = useState(true); // true = login, false = signup (testing)
 
-    const {session, UserLoading} = useRequireAuth();
-    
-    if(UserLoading || !session){
-        return <p>..checking credentials..</p>;
-    }
-    
-    //const [userName, setUserName] = useState('');
+    const {session, UserLoading} = useRequireAuth(); //check if logged in 
+
+    const [displayName, setDisplayName] = useState('');
     const [email,setEmail]=useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-
+    const [role, setRole] = useState('')
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
 
     //const navigate = useNavigate();
     const router = useRouter();
 
+    //check if logged in
+    if(UserLoading || !session){
+        return <p>..checking credentials..</p>;
+    }
+    
     
     const handleSignUp = async (e) => {
         e.preventDefault(); // Prevent form from refreshing the page
@@ -42,31 +48,37 @@ export default function AuthForm() {
             return;
         }
 
-        try {
+        try {//get database function to sign up new user
             const {data,error}=await supabase.auth.signUp({
-                email: email,
-                password: password,
+                email: email, //supabase checks if email for us
+                password: password, //supabase hashes for us
+                options:{
+                    data: {
+                        display_name:displayName,
+                        role:role,
+                    }, //user metadata
+                
+                },
             });
 
             if(error){
                 //setMessage(`Error: ${error.message}`);
                 console.log(`email: ${email}, password: ${password}`);
-
                 console.log("Error signing up user:\n", error);
+                
                 setMessage(error.message);
                 console.log(data);
                 setLoading(false);
                 return;
-
             }
             else{
-                setMessage('Success: Sign up!');
-                //redirect to admin page after successful login
+                setMessage('Success: Sign up!',data.user);
+                
                 console.log("User signed up successfully");
                 console.log(data);
                  //console.log("Session set successfully, redirecting to admin page...");
 
-                
+                //once user is signed up, supabase triggers a function to add a profile to the profile table to view users safer
             }
 
         }
@@ -93,6 +105,14 @@ export default function AuthForm() {
                     required
                 />
                 <input
+                    type='text'
+                    placeholder='DISPLAY NAME:'
+                    value={displayName}
+                    onChange={(e)=>setDisplayName(e.target.value)}
+                    disabled={loading}
+                    required
+                />
+                <input
                     type="password"
                     placeholder="PASSWORD:"
                     value={password}
@@ -108,6 +128,27 @@ export default function AuthForm() {
                     disabled={loading}
                     required
                     />
+                <section className='radio-signUp'>
+                    <input
+                        type="radio"
+                        id="ADMIN-radio"
+                        name="role"
+                        value="ADMIN"
+                        checked={role === 'ADMIN'}
+                        onChange={(e) => setRole(e.target.value)}
+                        />
+                    <label htmlFor="ADMIN-radio">Admin</label>
+
+                    <input
+                        type="radio"
+                        id="EDITOR-radio"
+                        name="role"
+                        value="EDITOR"
+                        checked={role === 'EDITOR'}
+                        onChange={(e) => setRole(e.target.value)}
+                        />
+                    <label htmlFor="EDITOR-radio">Editor</label>
+                </section>
                 
                 
 
@@ -131,28 +172,3 @@ export default function AuthForm() {
 }
 
 
-
-//  <main className="dashboard-container">
-//       {/* Connection Status */}
-//       <section className="add-dispatch-section">
-//         <h2 className="dashboard-heading">Add Dispatch Area</h2>
-//         <AddDispatchForm />
-//       </section>
-      
-//       {/* Connection Status */}
-//       <section className="add-fdra-section">
-//         <h2 className="dashboard-heading">Add FDRA</h2>
-//         <AddFDRAForm dispatchData={dispatchData} />
-//       </section>
-
-//       {/* Connection Status */}
-//       <DispatchAreasSection dispatchData={dispatchData} dispatchError={dispatchError} />
-
-//       {/* FDRA Section */}
-//       <FdraSection fdraData={fdraData} fdraError={fdraError} />
-//       {/* Stations Section */}
-//       <StationSection stationData={stationData} stationError={stationError} />
-
-//       {/* Connection Status */}
-//       <StatusSection dispatchError={dispatchError} fdraError={fdraError} stationError={stationError} />
-//     </main>

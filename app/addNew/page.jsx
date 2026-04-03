@@ -1,3 +1,5 @@
+'use client';
+
 //page to get user input for new stations to add to db, wrapped in refresh provider, which allows for refresh of all needed info
 import { RefreshProvider } from '../components/contexts/refreshContext.jsx';
 import  StationSearchForm  from '../components/newStationAdd/stationSearchForm.jsx'
@@ -5,8 +7,21 @@ import FDRASearchForm from '../components/newFdraAdd/fdraSearchForm.jsx'
 import DispatchAreaSearchForm from '@/app/components/newDispatchAreaAdd/dispatchAreaSearchForm.jsx'
 import DispatchAreaTable from '@/app/components/newDispatchAreaAdd/dispatchAreaTable.jsx'
 import  StationTable  from '../components/newStationAdd/stationTable.jsx'; //table to show all stations and their info, also allows for changing fdra assignment of stations
+import useRequireAuth from '../auth/useRequiredAuth.jsx'
 
 export default function AddDataPage() {
+    
+    //checking if user is logged in
+    const {session, loading} = useRequireAuth();
+    //const {logout} = useLogOut();
+    //const router = useRouter();
+    
+    //waiting for check
+    if(loading||!session){
+        return <p>...checking login credentials...</p>
+    }
+
+
 
     return (
         <RefreshProvider>

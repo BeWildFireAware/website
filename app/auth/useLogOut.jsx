@@ -1,5 +1,5 @@
 'use client'
-
+//this hook handles logging out user
 
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
