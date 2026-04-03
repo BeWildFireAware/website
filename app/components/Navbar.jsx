@@ -20,6 +20,8 @@ export default function Navbar() {
           <li>
             <Link href="/about">About Me</Link>
           </li>
+          <li>
+            {isLogin ? <Link href="/auth/logIn">Log In</Link> : <Link href="/auth/signUp">Sign Up New Admin</Link>} </li>
         </ul>
       </div>
     </nav>
