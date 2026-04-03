@@ -1,6 +1,6 @@
 {
-  "name": "goober",
-  "version": "0.1.0",
+  "name": "BWA",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -9,14 +9,11 @@
     "lint": "eslint"
   },
   "dependencies": {
-<<<<<<< HEAD
-    "@supabase/ssr": "^0.9.0",
-=======
     "@canvasjs/react-charts": "^1.0.2",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
-    "@mui/x-charts": "^8.28.0",
->>>>>>> b59144ad59cd2e69299b12728870477a83422688
+    "@mui/x-charts": "^8.28.2",
+    "@supabase/ssr": "^0.9.0",
     "@supabase/supabase-js": "^2.93.1",
     "date-fns": "^4.1.0",
     "next": "16.1.5",
