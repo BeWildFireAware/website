@@ -1,6 +1,8 @@
 
 'use server';
 //invocations of supabase fx (posts only) because these are js objects(form submissions)
+
+//constants
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const EDGE_FUNCTION_URL = `${supabaseUrl}/functions/v1/add-station`;  //all actions use same edge fx
@@ -12,15 +14,15 @@ export async function addStationToDatabase(stationInfo) {
         if (!supabaseUrl || !supabaseAnonKey) {
             throw new Error('Missing Supabase configuration');
         }
-        
+        //create json body with station info, send to edge function, returns success fail 
         const response = await fetch(EDGE_FUNCTION_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${supabaseAnonKey}`
-            },
+            },//add station info in body
             body: JSON.stringify({
-                action: 'add',  
+                action: 'add',  //defined cases in backend
                 stationId: stationInfo.stationId,
                 fuelModel: stationInfo.fuelModel,
                 fdraId: stationInfo.fdraId,
@@ -40,7 +42,7 @@ export async function addStationToDatabase(stationInfo) {
             success: true,
             message: result.message || 'Station added successfully',
             stationId: result.stationId ||stationInfo.stationId,
-            backgroundTaskStarted: result.backgroundTaskStarted || false //flag defined in index, to show user data is being added
+            backgroundTaskStarted: result.backgroundTaskStarted || false //flag defined in index(backend), to show user data is being added, takes a while(21 years of data)
         };
         
     } catch (error) {
@@ -53,7 +55,7 @@ export async function addStationToDatabase(stationInfo) {
     }
 }
 
-export async function getAllStations() {
+export async function getAllStations() { //get all for display in table
     try {
         if (!supabaseUrl || !supabaseAnonKey) {
             throw new Error('Missing Supabase configuration');
@@ -66,7 +68,7 @@ export async function getAllStations() {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${supabaseAnonKey}`
             },
-            body: JSON.stringify({ action: 'listStations' })  
+            body: JSON.stringify({ action: 'listStations' })  //dont need to send anything but action(case) bc just select
         });
         
         const result = await response.json();
@@ -89,7 +91,7 @@ export async function getAllStations() {
         };
     }
 }
-//add new association of station to fdra, name unchanged from original
+//add new association of station to fdra, name unchanged from original code, missleading (should be add relationship)
 export async function updateStationFdra(stationId, newFdraId) {
     try {
         if (!supabaseUrl || !supabaseAnonKey) {
@@ -132,7 +134,9 @@ export async function updateStationFdra(stationId, newFdraId) {
     }
 
 }
-// Check station data import status
+
+//doesnt use edge fx
+// Check station data import status(data being added in background ok)
 export async function checkStationDataStatus(stationId) {
     try {
         if (!supabaseUrl || !supabaseAnonKey) {
@@ -154,7 +158,7 @@ export async function checkStationDataStatus(stationId) {
         
         // log response for debug, first 100 chars
         const responseText = await response.text();
-        console.log(`Status check response body: ${responseText.substring(0, 100)}`);
+        console.log(`Status check response body: ${responseText.substring(0, 100)}`);//decrease size?
         
         let data;
         try {
@@ -175,7 +179,7 @@ export async function checkStationDataStatus(stationId) {
             };
         }
         
-        const hasData = data && data.length > 0;
+        const hasData = data && data.length > 0; //if length is 0, no data, if >0, has data, only if one record has added(dont need data here just bool)
         console.log(`Station ${stationId} has data: ${hasData}, record count: ${data?.length || 0}`);
         
         return {
@@ -193,7 +197,7 @@ export async function checkStationDataStatus(stationId) {
     }
 }
 
-//change fdra area for station
+//change fdra area for station(edge fx), delete old relationships(needed if fdra needs to be deleted)
 export async function moveStationFdra(stationId, newFdraId) {
     try {
         if (!supabaseUrl || !supabaseAnonKey) {

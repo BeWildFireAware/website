@@ -20,7 +20,7 @@ export default function StationSearchForm() {
     const [previewData, setPreviewData] = useState(null); //hold data preview for user confirmation before adding to db
     const [fdraOptions, setFdraOptions] = useState([]); //get fdra options from db to populate dropdown, set on page load with useEffect
     const [confirmMessage, setConfirmMessage] = useState(''); //message to user on succes or failure to add to db
-    // <-- NEW: States for background task tracking
+    // States for background task tracking
     const [statusMessage, setStatusMessage] = useState('');
     const [addedStationId, setAddedStationId] = useState(null);
     const [isCheckingStatus, setIsCheckingStatus] = useState(false);
@@ -49,10 +49,10 @@ export default function StationSearchForm() {
         }
 
         fetchFdraOptions(); //call the fx save data to array
-    }, [refreshFlag]);
+    }, [refreshFlag]); //refresh on any change
 
     
-    // poll for station data status after addition(staion only) to see if it is working properly
+    // poll for station data status after addition(staion only) to see if it is working properly, background job
     useEffect(() => {
         if (!addedStationId) return;
         
@@ -60,7 +60,7 @@ export default function StationSearchForm() {
         let timeout;
         
         const checkStatus = async () => {
-            setIsCheckingStatus(true);
+            setIsCheckingStatus(true); //disbale form while checking status
             console.log(`Polling status for station ${addedStationId}...`);
             
             const result = await checkStationDataStatus(addedStationId);
@@ -81,10 +81,10 @@ export default function StationSearchForm() {
                 clearTimeout(timeout);
             } else if (!result.success) {
 
-                // Error checking status - log the actual error
+                // Error checking status log the actual error
                 console.error(`Status check failed: ${result.error}`);
                 setStatusMessage(`Could not verify data import: ${result.error}. The station was added, data may still be importing`);
-                // Don't clear immediately - wait and try again
+                // Don't clear immediately wait and try again
                 // Keep polling for a bit longer
             } else if (!result.hasData) {
                 // No data yet, keep waiting
@@ -92,7 +92,7 @@ export default function StationSearchForm() {
             }
         };
         
-        // Poll every 3 seconds for up to 60 seconds 
+        // Poll every 3 seconds for up to 60 seconds -takes 4-15 seconds usually
         pollInterval = setInterval(checkStatus, 3000);
         timeout = setTimeout(() => {
             console.log(`Timeout reached for station ${addedStationId}`);
