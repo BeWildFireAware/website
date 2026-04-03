@@ -3,8 +3,8 @@
 import { stationSearch } from '../../actions/stationSearch.jsx'
 import { useState, useEffect } from 'react'
 import StationPreview from './previewStation.jsx'
-import { addStationToDatabase } from '../../actions/addStation.jsx'
-import { set } from 'date-fns'
+import { addStationToDatabase, checkStationDataStatus } from '../../actions/addStation.jsx'  // <-- NEW: Added checkStationDataStatus
+
 import { useRefresh } from '../contexts/refreshContext.jsx';
 
 
@@ -20,6 +20,10 @@ export default function StationSearchForm() {
     const [previewData, setPreviewData] = useState(null); //hold data preview for user confirmation before adding to db
     const [fdraOptions, setFdraOptions] = useState([]); //get fdra options from db to populate dropdown, set on page load with useEffect
     const [confirmMessage, setConfirmMessage] = useState(''); //message to user on succes or failure to add to db
+    // States for background task tracking
+    const [statusMessage, setStatusMessage] = useState('');
+    const [addedStationId, setAddedStationId] = useState(null);
+    const [isCheckingStatus, setIsCheckingStatus] = useState(false);
 
     //for entire page refresh on new data
     const {refreshFlag, triggerRefresh} = useRefresh(); //returns obj not array
@@ -45,7 +49,65 @@ export default function StationSearchForm() {
         }
 
         fetchFdraOptions(); //call the fx save data to array
-    }, [refreshFlag]);
+    }, [refreshFlag]); //refresh on any change
+
+    
+    // poll for station data status after addition(staion only) to see if it is working properly, background job
+    useEffect(() => {
+        if (!addedStationId) return;
+        
+        let pollInterval;
+        let timeout;
+        
+        const checkStatus = async () => {
+            setIsCheckingStatus(true); //disbale form while checking status
+            console.log(`Polling status for station ${addedStationId}...`);
+            
+            const result = await checkStationDataStatus(addedStationId);
+            console.log(`Poll result:`, result);
+            
+            // If the station is added and data, show success message and refresh
+            if (result.success && result.hasData) {
+                // Data imported successfully
+                console.log(`Data found! ${result.recordCount} records are being loaded.`);
+                setStatusMessage(`Historical data is being imported succesfully, ${result.recordCount} records loaded.`);
+                setTimeout(() => {
+                    setStatusMessage('');
+                    setAddedStationId(null);
+                    setIsCheckingStatus(false);
+                    triggerRefresh();
+                }, 5000);
+                clearInterval(pollInterval);
+                clearTimeout(timeout);
+            } else if (!result.success) {
+
+                // Error checking status log the actual error
+                console.error(`Status check failed: ${result.error}`);
+                setStatusMessage(`Could not verify data import: ${result.error}. The station was added, data may still be importing`);
+                // Don't clear immediately wait and try again
+                // Keep polling for a bit longer
+            } else if (!result.hasData) {
+                // No data yet, keep waiting
+                console.log(`No data yet for station ${addedStationId}...`);
+            }
+        };
+        
+        // Poll every 3 seconds for up to 60 seconds -takes 4-15 seconds usually
+        pollInterval = setInterval(checkStatus, 3000);
+        timeout = setTimeout(() => {
+            console.log(`Timeout reached for station ${addedStationId}`);
+            setStatusMessage(`Data import is taking longer than expected.`);
+            setTimeout(() => setStatusMessage(''), 10000);
+            clearInterval(pollInterval);
+            setAddedStationId(null);
+            setIsCheckingStatus(false);
+        }, 60000); // 60 second timeout
+        
+        return () => {
+            clearInterval(pollInterval);
+            clearTimeout(timeout);
+        };
+    }, [addedStationId, triggerRefresh]);
 
     async function handleSubmit(event) {
         event.preventDefault();
@@ -93,6 +155,7 @@ export default function StationSearchForm() {
         setIsAdding(true); //show adding state after user confirms preview, while waiting for edge fx
         setError(''); //clear any previous errors
         setConfirmMessage(''); //clear any previous messages
+        setStatusMessage(''); // Clear status message
         try{
             const result = await addStationToDatabase ({
                 stationId: stationInfo.stationId,
@@ -113,10 +176,14 @@ export default function StationSearchForm() {
                 setFdraId('');
                 setSearchResult(null);
                 setError(''); //clear any previous errors
-                setConfirmMessage('Station added successfully!'); //show success message
-                triggerRefresh();
-
-                setTimeout(() => setConfirmMessage(''), 5000); //clear success message after 5 seconds
+                //Show initial success message
+                setConfirmMessage('Station added! Historical data import started...');
+                
+                //Start polling for data import
+                setAddedStationId(result.stationId || stationInfo.stationId);
+                setStatusMessage('Importing historical data from 2005 to present. This may take a while...');
+                
+                setTimeout(() => setConfirmMessage(''), 3000);
             }
             
         }catch(error){
@@ -132,7 +199,9 @@ export default function StationSearchForm() {
         setPreviewData(null); //clear preview and return to search form for new search
         setSearchResult(null);
         setError("");
-        setConfirmMessage(''); 
+        setConfirmMessage('');
+        setStatusMessage(''); 
+        setAddedStationId(null); 
     };
     return (
         <div className="station-search-container">
@@ -144,7 +213,7 @@ export default function StationSearchForm() {
                     value={stationId}
                     onChange={(e) => setStationId(e.target.value)}
                     placeholder="Enter Station ID"
-                    disabled={isLoading}
+                    disabled={isLoading || isAdding || isCheckingStatus} 
                 />
             </div>
             <div>
@@ -152,7 +221,7 @@ export default function StationSearchForm() {
                 <select 
                     value={fuelModel}
                     onChange={(e) => setFuelModel(e.target.value)}
-                    disabled={isLoading}
+                    disabled={isLoading || isAdding || isCheckingStatus} 
                 >
                     <option value="V">V</option>
                     <option value="W">W</option>
@@ -166,7 +235,7 @@ export default function StationSearchForm() {
                 <select 
                     value={fdraId}
                     onChange={(e) => setFdraId(e.target.value)}
-                    disabled={isLoading}
+                    disabled={isLoading || isAdding || isCheckingStatus} // <-- NEW: Disable while checking status
                 >
                     <option value="">Select an FDRA</option>
                     {fdraOptions.map(fdra => (
@@ -176,7 +245,7 @@ export default function StationSearchForm() {
                     ))}
                 </select>
             </div>
-            <button type="submit" disabled={isLoading || isAdding}>
+            <button type="submit" disabled={isLoading || isAdding || isCheckingStatus}> 
                 {isLoading ? 'Searching...' : 'Search Station'}
             </button>
         </form> 
@@ -215,9 +284,18 @@ export default function StationSearchForm() {
                 <p>{confirmMessage}</p>
             </div>
         )}
+        {/* Status message for background task */}
+        {statusMessage && (
+            <div className="status-message">
+                <p>{statusMessage}</p>
+            </div>
+        )}
+        {/* Loading indicator while checking status */}
+        {isCheckingStatus && !statusMessage && (
+            <div className="loading-status">
+                <p>Checking data import status...</p>
+            </div>
+        )}
         </div>
     );
-
-
-
 }
