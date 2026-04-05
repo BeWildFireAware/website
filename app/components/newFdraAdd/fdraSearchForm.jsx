@@ -119,7 +119,7 @@ export default function FdraSearchForm() {
         <div className="fdra-search-form">
             
             <div className="add-fdra-section">
-                <h3>Add New FDRA</h3>
+                
                 
                 {message && (
                     <div className="success-message">

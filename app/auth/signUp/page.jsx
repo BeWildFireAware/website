@@ -18,7 +18,7 @@ import Link from 'next/link';
 export default function SignUpForm() {
     //const [isLogin, setIsLogin] = useState(true); // true = login, false = signup (testing)
 
-    const {session, UserLoading} = useRequireAuth(); //check if logged in 
+    const {session, UserLoading, isAdmin} = useRequireAuth(); //check if logged in 
 
     const [displayName, setDisplayName] = useState('');
     const [email,setEmail]=useState('');
@@ -35,8 +35,19 @@ export default function SignUpForm() {
     if(UserLoading || !session){
         return <p>..checking credentials..</p>;
     }
-    
-    
+
+    //check if user is admin
+    if(!isAdmin){
+        return (
+        <>
+            <p>Access denied. You must be an admin to sign up users.</p>
+            <button onClick={() => router.back()}>
+                Go Back
+            </button>
+        </>
+    );
+    }
+
     const handleSignUp = async (e) => {
         e.preventDefault(); // Prevent form from refreshing the page
         setLoading(true);

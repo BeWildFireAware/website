@@ -7,14 +7,14 @@
 import Link from 'next/link';
 
 import useRequireAuth from '../auth/useRequiredAuth.jsx'
-// import useLogOut from '../auth/useLogOut.jsx'
+import useLogOut from '../auth/useLogOut.jsx'
 import {useRouter } from 'next/navigation'
 import UsersConnected from '../components/user/userConnected.jsx';
 
 
 export default function AdminDashboard() {
     const {session, loading, isAdmin,displayName} = useRequireAuth(); //check if logged in
-    // const {logout} = useLogOut(); //logout function
+    const {logout} = useLogOut(); //logout function
     const router = useRouter();//redirect to differnet page
     
     
@@ -41,9 +41,7 @@ export default function AdminDashboard() {
                     </button>
                 )}
 
-                {/* <button onClick={logout}>
-                    LOG OUT!
-                </button> */}
+                
 
                 <button onClick={() => router.push('/addNew')}>
                     ADD NEW DATA
@@ -53,6 +51,9 @@ export default function AdminDashboard() {
                 {/* view users (admin sees all, editor sees own only) */}
                 <UsersConnected />
             </div>
+            <button onClick={logout}>
+                    LOG OUT!
+            </button>
     </>
     )
 
