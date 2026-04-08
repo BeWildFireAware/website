@@ -48,9 +48,26 @@ export async function stationSearch(formData) {
             console.error('Error checking existing station:', stationfetchError);
             return { error: 'Failed to check existing stations' }
         }
+        //new, check relationship table if this station fuel model exists, if not need to add
         if(existingStation) {
-            console.log(`Station ${stationId} already exists in database`); //debug log
-            return { exists: true, message: `Station ${stationId} already exists in database` }
+            const { data: relationship, error: relationshipError } = await supabase
+                .from('Station_FDRA_Combinations')
+                .select('Station_ID, FDRA_ID, Fuel_Model')
+                .eq('Station_ID', stationId)
+                .eq('FDRA_ID', fdraId)
+                .eq('Fuel_Model', fuelModel)
+                .maybeSingle();
+
+            if(relationshipError) {
+                console.error('Error checking station-FDRA relationship:', relationshipError);
+                return { error: 'Failed to check station-FDRA relationship' }
+            } 
+            if(relationship) {
+                console.log(`Station ${stationId} already exists in database with fuel model ${fuelModel}`); //debug log
+                return { exists: true, message: `Station ${stationId} already exists in database with fuel model ${fuelModel}` }
+            }   
+            console.log(`Station exists but relationship with FDRA ${fdraId} and fuel model ${fuelModel} does not exist`); //debug log
+            
         }  
         
         console.log(`fetching nfdr data for station ${stationId} with fuel model ${fuelModel}`); //debug log
