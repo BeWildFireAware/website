@@ -404,10 +404,9 @@ p {
   gap: 15px;
   background-color: #0B3D12;
   padding: 10px;
-  
-  
-  
+    
 }
+
 .nav-Bar-Top {
   display: flex;
   justify-content: right;
@@ -464,7 +463,7 @@ p {
   min-width: 300px;
   color: #fff;
   background-color: transparent;
-  background: url('/images/backgrndphoto.webp') no-repeat center center/cover !important;
+  background: url('/images/Copper_lake_trail,_crested_butte.jpg') no-repeat center center/cover !important;
   position: center;
   z-index: 1;
 }
@@ -684,69 +683,99 @@ p {
 
 /* ================= ADMIN ================= */
 .Auth-form-container {
+  margin: 3rem auto;
+  width: min(100%, 420px);
   padding: 30px;
-  border-radius: 12px;
-  width: 320px;
-  
+  border-radius: 16px;
+  background-color: #ffffff;
+  color: #111827;
+}
+
+@media (max-width: 640px) {
+  .Auth-form-container {
+    margin: 2rem 1rem;
+    width: calc(100% - 2rem);
+    padding: 24px;
+  }
 }
 
 .Auth-form-title {
   text-align: center;
-  font-size: larger;
-  color: black;
-  background-color: white;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 1rem;
 }
-
 
 .Auth-form {
   display: flex;
   flex-direction: column;
-  gap: 15px;
-  background-color: white;
-  padding: 20px;
+  gap: 1rem;
+  background-color: #ffffff;
+  padding: 1rem;
 }
 
-.Login-form input {
-  padding: 10px;
-  border: 1px solid red;
-  border-radius: 4px;
-  color: #000;
+.Auth-form label {
+  color: #111827;
+  font-weight: 600;
 }
 
-.Login-form button {
-  padding: 10px;
-  background-color: red;
-  color: white;
-  border: none;
-  border-radius: 4px;
+.Auth-form input,
+.Auth-form select,
+.Auth-form textarea {
+  width: 100%;
+  padding: 5px 10px;
+  border: 1px solid black;
+  background: #ffffff;
+  color: #111827;
 }
 
-.Login-form button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
+.Auth-form button {
+  padding: 0.95rem 1rem;
+  border-radius: 0.75rem;
+  background-color: blue;
+  color: #ffffff;
+  font-weight: 700;
 }
 
-.Login-form button:hover:not(:disabled) {
-  background-color: #ff6600;
-}
+
+
 
 .error-message {
-  background-color: red;
-  border: 1px solid black;
-  border-radius: 5px;
-  padding: 10px;
+  background-color: #fee2e2;
+  border: 1px solid #fca5a5;
+  border-radius: 0.75rem;
+  padding: 0.85rem 1rem;
+  color: #991b1b;
 }
 
 .success-message {
-  color: black;
+  color: #0f172a;
   background-color: #d1fae5;
   border: 1px solid #86efac;
-  border-radius: 5px;
-  padding: 10px;
+  border-radius: 0.75rem;
+  padding: 0.85rem 1rem;
 }
 
 .radio-signUp {
-  color: black
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1rem;
+  border: 1px solid black;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+  color: #111827;
+}
+
+.radio-signUp input {
+  accent-color: red;
+  margin-right: 0.35rem;
+}
+
+.radio-signUp label {
+  margin-right: 1rem;
+  cursor: pointer;
 }
 
 .userTable{

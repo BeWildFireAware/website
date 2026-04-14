@@ -43,7 +43,7 @@ export default function AdminDashboard() {
 
                 
 
-                <button onClick={() => router.push('/addNew')}>
+                <button onClick={() => router.push('/admin/addNew')}>
                     ADD NEW DATA
                 </button>
             </div>

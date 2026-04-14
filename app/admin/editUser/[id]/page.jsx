@@ -86,10 +86,10 @@ export default function EditUser() {
 
 
     return (
-        <div>
-            <h1>Edit User</h1>
+        <main className="Auth-form-container">
+            <h1 className="Auth-form-title">Edit User</h1>
 
-            <form onSubmit={handleUpdate}>
+            <form className="Auth-form" onSubmit={handleUpdate}>
                 <div>
                     <label>Display Name: </label>
                     <input
@@ -131,6 +131,6 @@ export default function EditUser() {
 
                 <button type="submit">Update User</button>
             </form>
-        </div>
+        </main>
     );
 }
