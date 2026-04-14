@@ -30,7 +30,7 @@ export async function GET() {
         
         const { data, error } = await supabase
             .from('FDRA')
-            .select('FDRA_ID, FDRAname')  // Select all to see what columns exist
+            .select('FDRA_ID, FDRAname, Fuel_Model')  // Select all to see what columns exist
             .order('FDRAname')
             
 

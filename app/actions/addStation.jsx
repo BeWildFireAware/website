@@ -198,7 +198,7 @@ export async function checkStationDataStatus(stationId) {
 }
 
 //change fdra area for station(edge fx), delete old relationships(needed if fdra needs to be deleted)
-export async function moveStationFdra(stationId, newFdraId) {
+export async function moveStationFdra(stationId, newFdraId, oldFdraId) {
     try {
         if (!supabaseUrl || !supabaseAnonKey) {
             throw new Error('Missing Supabase configuration');
@@ -213,7 +213,8 @@ export async function moveStationFdra(stationId, newFdraId) {
             body: JSON.stringify({
                 action: 'moveStationFDRA',
                 stationId: parseInt(stationId),
-                newFdraId: parseInt(newFdraId)
+                newFdraId: parseInt(newFdraId),
+                oldFdraId: parseInt(oldFdraId)
             })
         });
 
