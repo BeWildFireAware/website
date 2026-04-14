@@ -116,6 +116,7 @@ export default function StationTable() {
                         <th>Station Name</th>
                         <th>FDRA</th>
                         <th>Actions</th>
+                        <th>Fuel Model</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -151,6 +152,9 @@ export default function StationTable() {
                                         {station.FDRAname || 'Unknown'}
                                     </span>
                                 )}
+                            </td>
+                            <td className="station-fuel-model">
+                                {station.Fuel_Model || 'Unknown'}
                             </td>
                             <td className="station-actions">
                                 {updatingId === station.ID ? (
