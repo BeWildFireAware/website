@@ -113,9 +113,9 @@ export default function StationTable() {
             <table className="station-table">
                 <thead>
                     <tr>
+                        <th>Station ID</th>
                         <th>Station Name</th>
                         <th>FDRA</th>
-                        <th>Actions</th>
                         <th>Fuel Model</th>
                     </tr>
                 </thead>

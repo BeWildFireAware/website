@@ -42,7 +42,8 @@ export async function addStationToDatabase(stationInfo) {
             success: true,
             message: result.message || 'Station added successfully',
             stationId: result.stationId ||stationInfo.stationId,
-            backgroundTaskStarted: result.backgroundTaskStarted || false //flag defined in index(backend), to show user data is being added, takes a while(21 years of data)
+            backgroundTaskStarted: result.backgroundTaskStarted || false, //flag defined in index(backend), to show user data is being added, takes a while(21 years of data)
+            
         };
         
     } catch (error) {
