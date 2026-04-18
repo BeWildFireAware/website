@@ -808,3 +808,96 @@ p {
   flex-wrap: 'wrap';
   margin-top: '10px'
 }
+
+/* ================= email ================= */
+
+/* FireAlert component - simple solid colors */
+.test-email-form{
+  display: flex;
+  flex-direction: column;
+  max-width: 400px;
+  background-color: white;
+  margin: 0 auto;
+  padding: 20px;
+  border-radius: 8px;
+  border: 5px solid #00ff5e; /* Green border for testing */
+  color: black
+}
+
+.Fire_dangers_email{
+  display: flex;
+  flex-direction: column;
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  border-radius: 8px;
+  background-color: gray;
+  color: black;
+}
+
+.danger_email_cards{
+  background-color: black; /* gray-50 */
+  border: 1px solid #d1d5db; /* gray-300 */
+  border-radius: 0.5rem;
+  padding: 1rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  color:white
+}
+
+.fire-alert-card {
+  margin: 20px 0;
+  padding: 20px;
+  border-radius: 12px;
+  border: 2px solid;
+}
+
+.fire-alert-title {
+  margin-top: 0;
+  font-size: 1.5rem;
+  font-weight: bold;
+  
+}
+
+.fire-alert-details {
+  margin-bottom: 15px;
+}
+
+.fire-alert-details p {
+  margin: 5px 0;
+}
+
+.danger-level {
+  font-weight: bold;
+}
+
+.send-alert-btn {
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+  background-color: #666;           /* fallback color */
+}
+
+.send-alert-btn:disabled {
+  cursor: not-allowed;
+}
+
+.alert-result {
+  margin-top: 15px;
+  padding: 10px;
+  border-radius: 6px;
+}
+
+.alert-result.success {
+  background-color: #d4edda;
+  border: 1px solid green;
+  color: black;
+}
+
+.alert-result.error {
+  background-color: #f8d7da;
+  border: 1px solid red;
+  color: black;
+}
