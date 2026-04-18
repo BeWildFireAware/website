@@ -8,6 +8,7 @@ import DispatchAreaSearchForm from '@/app/components/newDispatchAreaAdd/dispatch
 import DispatchAreaTable from '@/app/components/newDispatchAreaAdd/dispatchAreaTable.jsx'
 import  StationTable  from '../../components/newStationAdd/stationTable.jsx'; //table to show all stations and their info, also allows for changing fdra assignment of stations
 import useRequireAuth from '../../auth/useRequiredAuth.jsx'
+import Link from 'next/link';
 
 export default function AddDataPage() {
     
@@ -50,7 +51,14 @@ export default function AddDataPage() {
                     <h2>All Dispatch Areas</h2>
                     <DispatchAreaTable/>
                 </div>
+
+                <div className='adminGoBack' >
+                    <Link href="../admin">
+                        ← Back to Admin Dashboard
+                    </Link>
+                </div>
             </div>
+
         </RefreshProvider>
         
     );

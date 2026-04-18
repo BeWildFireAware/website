@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import FireAlert from '@/app/components/sendEmail/fireAlert';
 import useRequireAuth from '../../auth/useRequiredAuth.jsx';
+import Link from 'next/link';
 
 export default function TestEmail() {
     const {session, UserLoading} = useRequireAuth(); //check if logged in 
@@ -165,7 +166,14 @@ export default function TestEmail() {
                         {result}
                     </div>
                 )} */}
+                <div >
+                    <Link href="../admin">
+                        ← Back to Admin Dashboard
+                    </Link>
+                </div>
             </div>
+
+            
 
             <div className='Fire_dangers_email'>
                 <h2>Fire Alert Test</h2>

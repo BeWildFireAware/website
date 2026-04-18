@@ -461,11 +461,11 @@ p {
   padding-bottom: 100px;
   min-height: 300px;
   min-width: 300px;
-  color: #fff;
-  background-color: transparent;
-  background: url('/images/Copper_lake_trail,_crested_butte.jpg') no-repeat center center/cover !important;
-  position: center;
-  z-index: 1;
+  color: white;
+  text-shadow: 5px 5px 5px black;
+  background-image: url('/images/Copper_Lake_Trail,_Crested_Butte.jpg');
+  background-position: center;   /* keeps image centered */
+  background-size: cover;        /* fills nicely */;
 }
 
 
@@ -807,6 +807,13 @@ p {
   gap: '10px';
   flex-wrap: 'wrap';
   margin-top: '10px'
+}
+.adminGoBack {
+  display: inline-block;  
+  margin-top: 20px;
+  background-color: yellow;
+  color: black;
+  padding: 5px 10px;      
 }
 
 /* ================= email ================= */
