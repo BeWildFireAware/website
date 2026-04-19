@@ -27,8 +27,12 @@ export default function AddDataPage() {
         <RefreshProvider>
             <div className="add-data-page">
                 <div className="add-station-section">
+                    <button onClick={() => router.push('/admin')}>
+                        Admin Dashboard
+                    </button>
                     <h2>Add New Station</h2>
                     <p>Enter the new station ID, fuel model, and fdra it belongs to</p>
+                    
                     <StationSearchForm />
                 </div>
                 <div>

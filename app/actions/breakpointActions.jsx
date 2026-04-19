@@ -11,11 +11,11 @@ export async function getFdraOptions() {
             headers: { Authorization: `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json' },
             body: JSON.stringify({ action: 'getFdraOptions' })
         });
-        const data = await response.json();
+        const result = await response.json();
         if (!response.ok) {
-            throw new Error(data.error || 'Failed to fetch FDRA options');
+            throw new Error(result.error || 'Failed to fetch FDRA options');
         }   
-        return { success: true, data };
+        return result.data; // Assuming the edge function returns { success: true, data: [...] };
     } catch (error) {
         console.error('Error fetching FDRA options:', error);
         return { success: false, error: 'Failed to fetch FDRA options' };
@@ -34,7 +34,7 @@ export async function getBreakpoints(fdraId) {
         if (!response.ok) {
             throw new Error(data.error || 'Failed to fetch breakpoints');
         }
-        return { success: true, data };
+        return { useBi: data.useBi, breakpoints: data.breakpoints }; // Assuming the edge function returns { success: true, useBi: true/false, breakpoints: [...] };
 
     } catch (error) {
         console.error('Error fetching breakpoints:', error);
@@ -52,7 +52,7 @@ export async function updateBreakpoints(fdraId, updatedData) {
         if (!response.ok) {
             throw new Error(data.error || 'Failed to update breakpoint');
         }
-        return { success: true, data };
+        return { success: true, message: data.message };
     } catch (error) {
         console.error('Error updating breakpoint:', error);
         return { success: false, error: 'Failed to update breakpoint' };

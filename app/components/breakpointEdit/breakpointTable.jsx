@@ -20,7 +20,7 @@ export default function BreakpointTable() {
 
     //group by dispatch area for dropdowns
     const groupedFdras = fdraOptions.reduce((acc, fdra) => {
-        const dispatchArea = fdra.Dispatch_Area?.DispatchName || 'Unassigned';
+        const dispatchArea = fdra.DispatchName || 'Unassigned';
         if (!acc[dispatchArea]) {
             acc[dispatchArea] = [];
         }
@@ -31,8 +31,9 @@ export default function BreakpointTable() {
     //setup for tables, fetch data
     useEffect(() => {
         getFdraOptions().then(result => {
-            if(result.success && Array.isArray(result.data)){
-                setFdraOptions(result.data);
+            if(Array.isArray(result) && result.length > 0){
+                setFdraOptions(result);
+                setError('');
             } else {
                 console.error('Failed to load FDRA options:', result.error);
                 setFdraOptions([]);
@@ -52,13 +53,14 @@ export default function BreakpointTable() {
         }
         setIsLoading(true);
         getBreakpoints(selectedFdra).then(result => {
-            if(result.useBi !== undefined && Array.isArray(result.breakpoints)){
+            if(result && typeof result.useBi === 'boolean' && Array.isArray(result.breakpoints)){ //make sure usebi is a boolean andbreakpointsis an array
                 setUseBi(result.useBi);
                 setBreakpoints(result.breakpoints);
                 setError('');
-            }else if (result.success === false){
-                setBreakpoints([]);
+            }else{
+                setBreakpoints([]); 
                 console.error('Failed to load breakpoints:', result.error);
+                setError(result.error || 'Failed to load breakpoints');
             } 
         }).catch(error => {
             console.error('Error fetching breakpoints:', error);
@@ -105,7 +107,7 @@ export default function BreakpointTable() {
                         <optgroup key={dispatchArea} label={dispatchArea}>
                             {fdras.map((fdra) => (
                                 <option key={fdra.FDRA_ID} value={fdra.FDRA_ID}>
-                                    {fdra.Fdraname} (Fuel: {fdra.Fuel_Model})
+                                    {fdra.FDRAname} (Fuel: {fdra.Fuel_Model})
                                 </option>
                             ))}
                         </optgroup>

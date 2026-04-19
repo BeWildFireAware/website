@@ -16,7 +16,11 @@ export default function editBreakpointPage() {
 
     return (
         <div className="edit-breakpoint-page">
+            <button onClick={() => router.push('/admin')}>
+                Admin Dashboard
+            </button>
             <h1>Edit Breakpoints</h1>
+            
             <BreakpointTable/>
         </div>
     );
