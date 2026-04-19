@@ -32,6 +32,7 @@ export async function addFdra(formData) {
         //get vals to send to edge fx
         const fdraName = formData.get('fdraName');
         const dispatchAreaId = formData.get('dispatchAreaId');
+        const fuelModel = formData.get('fuelModel'); //get fuel model
 
 
         const response = await fetch(`${EDGE_FUNCTION_URL}`, {
@@ -40,7 +41,7 @@ export async function addFdra(formData) {
                 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ action: 'add', FDRAname: fdraName, Dispatch_ID: parseInt(dispatchAreaId, 10) })
+            body: JSON.stringify({ action: 'add', FDRAname: fdraName, Dispatch_ID: parseInt(dispatchAreaId, 10), FuelModel: fuelModel })
         });
 
         const result = await response.json();

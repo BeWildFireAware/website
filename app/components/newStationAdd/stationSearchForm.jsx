@@ -51,7 +51,14 @@ export default function StationSearchForm() {
         fetchFdraOptions(); //call the fx save data to array
     }, [refreshFlag]); //refresh on any change
 
-    
+    useEffect(() => { //auto set fuel model when select fdr, prevent mismatch
+        if (!fdraId) return;
+        
+        const selectedFdra = fdraOptions.find(f => f.FDRA_ID === parseInt(fdraId));
+        if (selectedFdra?.Fuel_Model) {
+            setFuelModel(selectedFdra.Fuel_Model);
+        }
+    }, [fdraId, fdraOptions]);
     // poll for station data status after addition(staion only) to see if it is working properly, background job
     useEffect(() => {
         if (!addedStationId) return;
@@ -152,6 +159,8 @@ export default function StationSearchForm() {
     } 
     const handleConfirm = async (stationInfo) => {
         console.log('User confirmed station add with info:', stationInfo);
+        console.log('stationInfo.fuelModel:', stationInfo.fuelModel);
+        console.log('State fuelModel:', fuelModel);
         setIsAdding(true); //show adding state after user confirms preview, while waiting for edge fx
         setError(''); //clear any previous errors
         setConfirmMessage(''); //clear any previous messages
@@ -159,7 +168,7 @@ export default function StationSearchForm() {
         try{
             const result = await addStationToDatabase ({
                 stationId: stationInfo.stationId,
-                fuelModel: stationInfo.fuelModel,
+                fuelModel: fuelModel,
                 fdraId: stationInfo.fdraId,
                 stationName: stationInfo.stationData.stationName
             });

@@ -14,6 +14,7 @@ export default function FdraSearchForm() {
     const [dispatchAreaId, setDispatchAreaId] = useState('');
     const [dispatchAreas, setDispatchAreas] = useState([]);
     const [fdras, setFdras] = useState([]);
+    const [fuelModel, setFuelModel] = useState('Y');  // Default to Y
     
     // ui states, display msg, show loading
     const [message, setMessage] = useState('');
@@ -90,7 +91,7 @@ export default function FdraSearchForm() {
             const formData = new FormData();
             formData.append('fdraName', fdraName);
             formData.append('dispatchAreaId', dispatchAreaId);
-
+            formData.append('fuelModel', fuelModel);
             const result = await addFdra(formData);
             
             if (result.success) {
@@ -145,6 +146,19 @@ export default function FdraSearchForm() {
                             disabled={isLoading}
                         />
                         <small>Minimum 2 characters, maximum 50 characters</small>
+                        <select
+                            id="fuelModel"
+                            value={fuelModel}
+                            onChange={(e) => setFuelModel(e.target.value)}
+                            disabled={isLoading}
+                        >
+                            <option value="V">V</option>
+                            <option value="W">W</option>
+                            <option value="X">X</option>
+                            <option value="Y">Y</option>
+                            <option value="Z">Z</option>
+                        </select>
+                        <small>Fuel model determines NFDRS fire danger data</small>
                     </div>
                     
                     <div className="form-group">
