@@ -114,7 +114,7 @@ export default function BreakpointTable() {
                     ))}
                 </select>
             </div>
-            {isLoading && <p>Loading breakpoints...</p>}
+            {isLoading && !selectedFdra && <p>No Fdra Selected please select one from the dropdown</p>}
 
             {error && <div className="error-message">{error}</div>}
             

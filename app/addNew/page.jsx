@@ -8,9 +8,11 @@ import DispatchAreaSearchForm from '@/app/components/newDispatchAreaAdd/dispatch
 import DispatchAreaTable from '@/app/components/newDispatchAreaAdd/dispatchAreaTable.jsx'
 import  StationTable  from '../components/newStationAdd/stationTable.jsx'; //table to show all stations and their info, also allows for changing fdra assignment of stations
 import useRequireAuth from '../auth/useRequiredAuth.jsx'
+import {useRouter } from 'next/navigation'
 
 export default function AddDataPage() {
-    
+    const router = useRouter();
+
     //checking if user is logged in
     const {session, loading} = useRequireAuth();
     //const {logout} = useLogOut();

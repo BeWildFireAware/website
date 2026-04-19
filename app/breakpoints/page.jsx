@@ -1,9 +1,9 @@
 'use client';
 import BreakpointTable from '@/app/components/breakpointEdit/breakpointTable.jsx';
 import useRequireAuth from '../auth/useRequiredAuth.jsx'
-
+import {useRouter } from 'next/navigation'
 export default function editBreakpointPage() {
-    
+    const router = useRouter();
     //checking if user is logged in
     const {session, loading} = useRequireAuth();
     //const {logout} = useLogOut();
