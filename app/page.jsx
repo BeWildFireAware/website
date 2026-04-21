@@ -2,6 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import ExtremeDangerList from "./components/homeComp/extremeDangerList";
+
 export default function homePage() {
   return(
     <>
@@ -13,6 +15,9 @@ export default function homePage() {
     <h2>Dispatch Areas</h2>
     <p>Explore the current wildfire danger in your area</p>
     <Link href="/map"> <button>Explore Dispatch Areas</button></Link>
+    <div className='extreme-danger-list'>
+      <ExtremeDangerList />
+    </div>
     <img src="/images/FEMS_logo.png" width="301" height="47"/>
 
     <p>Weather and NFDRS data now coming from FEMS</p> 
