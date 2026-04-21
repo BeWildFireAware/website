@@ -16,10 +16,13 @@
     "@supabase/ssr": "^0.9.0",
     "@supabase/supabase-js": "^2.93.1",
     "date-fns": "^4.1.0",
+    "leaflet": "^1.9.4",
+    "leaflet-defaulticon-compatibility": "^0.1.2",
     "next": "^16.2.2",
     "papaparse": "^5.5.3",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "react-leaflet": "^5.0.0",
     "recharts": "^3.8.1"
   },
   "devDependencies": {

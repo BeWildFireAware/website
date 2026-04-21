@@ -5,6 +5,7 @@ import Link from "next/link";
 import DropDownClient from "./components/dropdown_comp/DropDownClient";
 import { GetDropdownData } from "./components/dropdown_comp/GetDropdownData";
 import AuthNav from "./components/authNav"
+import 'leaflet/dist/leaflet.css'; //for map comp 
 
 export const metadata = {
   title: "Wildfire Data Dashboard",

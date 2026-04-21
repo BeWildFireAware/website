@@ -136,6 +136,7 @@ export default function BreakpointTable() {
             {!isLoading && selectedFdra && breakpoints.length === 0 && (
                 <p>No breakpoints found for the selected FDRA.</p>
             )}
+            
         </div>
     );
 
