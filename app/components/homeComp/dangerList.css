@@ -1,0 +1,156 @@
+
+/* Extreme Danger List Container */
+.extreme-danger-container {
+    margin: 24px 0;
+    max-width: 500px;
+    background: #fff5f5;
+    border: 2px solid #0a0a0a;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(223, 9, 9, 0.15);
+}
+
+/* Header Section */
+.extreme-danger-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, #d7150f 0%, #137829 100%);
+    color: white;
+}
+
+.extreme-danger-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.extreme-icon {
+    font-size: 20px;
+}
+
+.extreme-count {
+    margin-left: auto;
+    background: rgba(255, 255, 255, 0.25);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+/* Content Section */
+.extreme-danger-content {
+    padding: 16px 20px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+/* Dispatch Group */
+.dispatch-group {
+    margin-bottom: 20px;
+}
+
+.dispatch-group:last-child {
+    margin-bottom: 0;
+}
+
+.dispatch-title {
+    margin: 0 0 10px 0;
+    padding-bottom: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #555;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+/* FDRA List */
+.fdra-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.fdra-item {
+    margin-bottom: 6px;
+}
+
+.fdra-item:last-child {
+    margin-bottom: 0;
+}
+
+.fdra-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: white;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: 1px solid #f0e6f4;
+}
+
+.fdra-link:hover {
+    background: #f3e5f5;
+    border-color: #cb1818;
+    transform: translateX(2px);
+}
+
+.fdra-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+}
+
+.fdra-badge {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    background: #d7150f;
+    color: white;
+    border-radius: 12px;
+    letter-spacing: 0.3px;
+}
+
+/* Loading/Error/Empty States */
+.extreme-loading,
+.extreme-error,
+.extreme-none {
+    padding: 20px;
+    text-align: left;
+    font-size: 14px;
+    color: #666;
+}
+
+.extreme-none {
+    color: #28a745;
+    font-weight: 500;
+}
+
+.extreme-error {
+    color: #dc3545;
+}
+
+/* Scrollbar Styling for future if many fdras*/
+.extreme-danger-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.extreme-danger-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.extreme-danger-content::-webkit-scrollbar-thumb {
+    background: #ce93d8;
+    border-radius: 10px;
+}
+
+.extreme-danger-content::-webkit-scrollbar-thumb:hover {
+    background: #ab47bc;
+}
