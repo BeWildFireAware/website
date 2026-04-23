@@ -1,4 +1,4 @@
-//issue:very slow to load
+//create interactive map for fdra areas, using leaflet library, with polys
 
 'use client';
 import { MapContainer, TileLayer, GeoJSON, useMap } from 'react-leaflet';
@@ -13,7 +13,7 @@ L.Icon.Default.mergeOptions({
   iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
   shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
 });
-//basic style for map container, can be adjusted as needed, moved to globals
+//basic style for map container, can be adjusted as needed or moved to globals
 const mapContainerStyle = {
   width: '100%',
   height: '600px',
@@ -54,6 +54,7 @@ export default function FdraMap() {
   const [locationError, setLocationError] = useState(null);
   const [locationLoading, setLocationLoading] = useState(true);
 
+  //get user location on mount, with error handling and loading state
     useEffect(() => {
         if (!navigator.geolocation) {
             setLocationError('Geolocation is not supported by your browser');

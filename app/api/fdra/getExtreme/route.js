@@ -1,6 +1,7 @@
-//get all fdra with extreme ratings(and relavent info for display)
+//get all fdras with extreme ratings(and relavent info for display)
 import { createClient } from '@supabase/supabase-js';
 
+//get data
 export async function GET() {
     try {
         console.log('Map');
@@ -32,7 +33,7 @@ export async function GET() {
                 Danger_Level,
                 DispatchArea:Dispatch_ID (DispatchName) //to filter byand dispay
             `)
-            .eq('Danger_Level', 'Extreme') //only extreme
+            .eq('Danger_Level', 'Extreme') //only extreme, dont know why 
             .order('DispatchName', { foreignTable: 'DispatchArea', ascending: true }) //order by dispatch name then fdras
             .order('FDRAname', { ascending: true });
 

@@ -3,6 +3,7 @@ export default function ErcBiTable({breakpoints, dangerLevels, onChange}){
     // Sort breakpoints by Danger_Level (ascending)
     const sortedBreakpoints = [...breakpoints].sort((a, b) => a.Danger_Level - b.Danger_Level);
     
+    //table, sort by dangerlevel for organization
     return (
         <table className="erc-bi-table">
             <thead>

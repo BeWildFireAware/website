@@ -1,8 +1,10 @@
+//this component is responsible for fetching and displaying the nearest FDRA to the user based on their geolocation
 'use client'
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import "./nearestFdra.css"; //basic css for the nearest fdra component, can be adjusted as needed, moved to globals
-const dangerLevelColors = {
+import "./nearestFdra.css"; //basic css for the nearest fdra component, can be adjusted as needed
+
+const dangerLevelColors = { //fire danger level to color mapping, can be adjusted as needed
     'Low': '#2ecc71',
     'Moderate': '#f3c612',
     'High': '#e35311',
@@ -46,7 +48,7 @@ export default function NearestFdra() {
                     } else if (data.inside) {
                         
                         setInsideFdra(true);
-                        setFdra(data.closest); // API returns "closest" even when inside
+                        setFdra(data.closest); // API returns closest even when inside
                     } else if (data.closest) {
                         setInsideFdra(false);
                         setFdra(data.closest);
@@ -112,7 +114,7 @@ export default function NearestFdra() {
         <div className="closest-fdra-container">
             <h3>
                 
-                {insideFdra ? 'You are inside:' : 'Nearest FDRA: '}
+                {insideFdra ? 'Your FDRA:' : 'Nearest FDRA: '}
             </h3>
             
             <div className="closest-fdra-details">

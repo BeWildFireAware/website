@@ -1,3 +1,4 @@
+//erc only table
 export default function ErcTable({breakpoints, dangerLevels, onChange}){
     return (
         <table className="erc-table">

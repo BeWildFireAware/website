@@ -1,3 +1,4 @@
+//component to list all extreme danger areas  and link to specific page
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';

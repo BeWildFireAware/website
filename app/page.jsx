@@ -12,9 +12,7 @@ export default function homePage() {
       <h1>Be Wildfire Aware</h1>
       <p> Stay Informed and Stay Safe</p>  
     </section> 
-    <h2>Dispatch Areas</h2>
-    <p>Explore the current wildfire danger in your area</p>
-    <Link href="/map"> <button>Explore Dispatch Areas</button></Link>
+    
     <div className='extreme-danger-list'>
       <ExtremeDangerList />
     </div>

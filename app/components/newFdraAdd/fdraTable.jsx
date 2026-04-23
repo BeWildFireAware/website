@@ -1,3 +1,4 @@
+//table for fdras and fuel models
 'use client';
 import { useState, useEffect } from 'react';
 import { deleteFdra } from '../../actions/fdraActions';

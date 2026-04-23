@@ -1,4 +1,5 @@
-// /app/api/fdraOptions/route.js
+// Next.js API route to fetch all FDRA options for dropdowns and displays
+
 import { createClient } from '@supabase/supabase-js'
 
 export async function GET() {

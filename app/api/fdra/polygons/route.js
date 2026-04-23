@@ -1,4 +1,4 @@
-// must be named route
+// Next.js API route to fetch all FDRA polygons and related info for map display
 import { createClient } from '@supabase/supabase-js';
 
 export async function GET() {

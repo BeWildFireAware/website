@@ -1,9 +1,11 @@
+//server actions for breakpoints
 'use server';
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const EDGE_FUNCTION_URL = `${SUPABASE_URL}/functions/v1/breakpoint-service`; //REMEMBER TO NAME THE DGE FX THIS
 
+//get available fdras
 export async function getFdraOptions() {
     try {
         const response = await fetch(`${EDGE_FUNCTION_URL}`, {
@@ -22,7 +24,7 @@ export async function getFdraOptions() {
     }
 }
 
-
+//frda specific breakpoints
 export async function getBreakpoints(fdraId) {
     try {
         const response = await fetch(`${EDGE_FUNCTION_URL}`, {
@@ -41,6 +43,7 @@ export async function getBreakpoints(fdraId) {
         return { success: false, error: 'Failed to fetch breakpoints' };
     }       
 }
+//update breakpoints for fdra
 export async function updateBreakpoints(fdraId, updatedData) {
     try {
         const response = await fetch(`${EDGE_FUNCTION_URL}`, {

@@ -1,8 +1,8 @@
-
+// Next.js API route to determine if a user is inside an FDRA polygon and find the closest FDRA if not
 import { createClient } from "@supabase/supabase-js";
 //get and parse lat and long from query
 
-//haversine distance(distace between two lat long points) used for finding closest fdra when user is outside all polygons
+//haversine distance(distace between two lat long points) used for finding closest fdra when user is outside all polygons (of a sphere)
 function haversineDistance(lat1, lng1, lat2, lng2) {
     const R = 3958.8; // Earth's radius in miles
     const dLat = (lat2 - lat1) * Math.PI / 180;  //degree to radians(expected format)
@@ -59,7 +59,7 @@ function getPolygonCenter(polygon) {
     };
 }
 
-
+//get datafrom supabase
 export async function GET(request) {
     try {
         

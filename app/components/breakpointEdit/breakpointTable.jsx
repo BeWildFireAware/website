@@ -1,10 +1,10 @@
+//table for breakpoints(edits and display)
 'use client';
 import { getFdraOptions, getBreakpoints, updateBreakpoints} from '@/app/actions/breakpointActions.jsx';
 import { useState, useEffect } from 'react';
 import ErcTable from './ercTable.jsx';
 import ErcBiTable from './ercBiTable.jsx';
-import { set } from 'date-fns';
-import { se } from 'date-fns/locale';
+
 
 const DANGER_LEVELS = ['Low', 'Moderate', 'High', 'Very High', 'Extreme'];
 
@@ -46,6 +46,7 @@ export default function BreakpointTable() {
         });
     }, []);
 
+    //fetch breakpoints when fdra selected, also handles loading and error states
     useEffect(() => {
         if(!selectedFdra){
             setBreakpoints([]);
@@ -71,6 +72,7 @@ export default function BreakpointTable() {
         });
     }, [selectedFdra]);
 
+    //handledata update
     const handleUpdate = async () => {
         setSaving(true);
         setError('');
@@ -96,7 +98,7 @@ export default function BreakpointTable() {
         updatedBreakpoints[index] = { ...updatedBreakpoints[index], [field]: parseFloat(value) || 0 };
         setBreakpoints(updatedBreakpoints);
     };
-
+//table+ form
     return (
         <div>
             <div className='breakpointHeader'>

@@ -1,3 +1,4 @@
+//this component renders the form for adding a new dispatch area, imported into the add data page
 'use client'
 import { useState, useEffect } from 'react'
 import { getDispatchAreas, addDispatchAreas } from '../../actions/dispatchAreaActions'
@@ -9,9 +10,11 @@ export default function DispatchAreaSearchForm(){
     const [dispatchName, setDispatchName] = useState('');
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
+    const [useBi, setUseBi] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const {refreshFlag, triggerRefresh} = useRefresh();
 
+    //on submit validate input then call server action
     async function handleSubmit(event) {
         event.preventDefault();
         
@@ -31,9 +34,11 @@ export default function DispatchAreaSearchForm(){
         setError('');
         setMessage("")
         setIsLoading(true);
+        //call server action
         try {
             const formData = new FormData();
             formData.append('dispatchAreaName', dispatchName);
+            formData.append('useBi', useBi);
             const result = await addDispatchAreas(formData);
 
             if(result.success){
@@ -56,7 +61,8 @@ export default function DispatchAreaSearchForm(){
             setIsLoading(false);
         }
     }  
-    
+
+    //form
     return (
         <div className="dispatch-area-form-container">
             <form onSubmit={handleSubmit} className="dispatch-area-form">
@@ -69,7 +75,17 @@ export default function DispatchAreaSearchForm(){
                         onChange={(e) => setDispatchName(e.target.value)}
                         placeholder="Enter dispatch area name"
                     />
-                    <small> Minimum 2 characters, maximum 50 characters</small>
+                    
+                    <label htmlFor="useBi">
+                        <input 
+                            type="checkbox"
+                            id="useBi"
+                            checked={useBi}
+                            onChange={(e) => setUseBi(e.target.checked)}
+                        />
+                        use BI+ERC: 
+                    </label> 
+                    <small> if checked this area will use ERC+BI to calculate breakpoints</small>
                 </div>
                 
 

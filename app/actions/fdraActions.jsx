@@ -1,3 +1,4 @@
+//server actions for fdra management(create delete, list)
 'use server';
 
 //file that calls edge function
@@ -5,6 +6,7 @@ const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const EDGE_FUNCTION_URL = `${SUPABASE_URL}/functions/v1/fdra-service`;
 
+//get all fdras for display
 export async function getFdras() {
     try {
         
@@ -27,6 +29,7 @@ export async function getFdras() {
         return { success: false, error: 'Failed to fetch FDRAs' };
     }
 }
+//add fdra, send to edge fx, edge fx adds to db, returns success fail
 export async function addFdra(formData) {
     try {
         //get vals to send to edge fx
@@ -54,6 +57,7 @@ export async function addFdra(formData) {
         return { success: false, error: 'Failed to add Fdra' };
     }
 }
+//get dispatch areas for dropdown in add fdra form
 export async function getDispatchAreas() {
     try {
         const response = await fetch(`${EDGE_FUNCTION_URL}`, {
@@ -74,7 +78,7 @@ export async function getDispatchAreas() {
         return { success: false, error: 'Failed to fetch dispatch areas' };
     }
 }
-
+//delete fdra if no stations assigned
 export async function deleteFdra(fdraId) {
     try{
         const response = await fetch(`${EDGE_FUNCTION_URL}`, {

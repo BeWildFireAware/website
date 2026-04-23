@@ -38,7 +38,7 @@ export default function StationPreview({ data, stationId, fuelModel, fdraId, onC
         // Call the parent's onDeny function to clear the preview
         onDeny();
     };
-
+//fx to display preview of station data before confirming add to database
     return (
         <div className="station-preview">
             <h3>Station Preview</h3>

@@ -1,7 +1,6 @@
 'use server';
-
-import { ca } from "date-fns/locale";
-
+//server actions for dispatch areas, called from dispatchAreaSearchForm.jsx
+//calls supabase
 //call supabase edge fx
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -9,6 +8,8 @@ const EDGE_FUNCTION_URL = `${SUPABASE_URL}/functions/v1/dispatch-service`;
 
 export async function addDispatchAreas(formData) {
     const name = formData.get('dispatchAreaName');
+    const useBiVal = formData.get('useBi') // Convert string to boolean(if null then false)
+    const useBi = useBiVal === 'true' || useBiVal === 'on'; //checkbox returns on
     if (!name || !name.trim()) {
         return { success: false, error: 'Dispatch area name cannot be empty' };
     }
@@ -19,7 +20,7 @@ export async function addDispatchAreas(formData) {
         return { success: false, error: 'Dispatch area name must be less than 50 characters' };
     }
     try{
-        const response = await fetch(`${EDGE_FUNCTION_URL} `,{
+        const response = await fetch(`${EDGE_FUNCTION_URL}`,{
             method: 'POST',
             headers: {
                 'Content-Type' : 'application/json',
@@ -27,7 +28,7 @@ export async function addDispatchAreas(formData) {
                 'apikey': SUPABASE_ANON_KEY,
                 'prefer': 'return=representation'
             },
-            body: JSON.stringify({ action: 'add', DispatchName: name.trim() })
+            body: JSON.stringify({ action: 'add', DispatchName: name.trim(), UseBi: useBi }) //call this action from supabase index with these vals
             
                 
         });
@@ -44,7 +45,7 @@ export async function addDispatchAreas(formData) {
     }
 
 }
-export async function deleteDispatchAreas(dispatchId, dispatchName) {
+export async function deleteDispatchAreas(dispatchId, dispatchName) { //leaving in dispatch name in case fx call uses name(backwards compatibility)
     if(!dispatchId) {
         return { success: false, error: 'Invalid dispatch area ID' };
     }
@@ -58,7 +59,7 @@ export async function deleteDispatchAreas(dispatchId, dispatchName) {
                 'apikey': SUPABASE_ANON_KEY,
                 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
             },
-            body: JSON.stringify({ action: 'checkDependencies', Dispatch_ID: parseInt(dispatchId) })
+            body: JSON.stringify({ action: 'checkDependencies', Dispatch_ID: parseInt(dispatchId) }) //supabase action
 
         });
         const fdras = await response.json();
