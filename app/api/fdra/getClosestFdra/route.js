@@ -2,6 +2,28 @@
 import { createClient } from "@supabase/supabase-js";
 //get and parse lat and long from query
 
+
+//get poly type from map poly, which can be in different formats depending on how it's stored in supabase, and extract the actual polygon coordinates for use in point-in-polygon checks and distance calculations
+function extractPolygon(mapPoly) {
+    if (!mapPoly) return null;
+    
+    // If it's already a Polygon or MultiPolygon, return as-is
+    if (mapPoly.type === 'Polygon' || mapPoly.type === 'MultiPolygon') {
+        return mapPoly;
+    }
+    
+    // If it's a Feature, extract geometry
+    if (mapPoly.type === 'Feature' && mapPoly.geometry) {
+        return extractPolygon(mapPoly.geometry);
+    }
+    
+    // If it's a FeatureCollection, extract first feature's geometry
+    if (mapPoly.type === 'FeatureCollection' && mapPoly.features?.length > 0) {
+        return extractPolygon(mapPoly.features[0]);
+    }
+    
+    return null;
+}
 //haversine distance(distace between two lat long points) used for finding closest fdra when user is outside all polygons (of a sphere)
 function haversineDistance(lat1, lng1, lat2, lng2) {
     const R = 3958.8; // Earth's radius in miles
@@ -105,7 +127,9 @@ export async function GET(request) {
 
         // First: Check if user is inside any FDRA polygon
         for (const fdra of data) {
-            if (fdra.Map_Poly && pointInPolygon(lat, lng, fdra.Map_Poly)) {
+            const polygon = extractPolygon(fdra.Map_Poly);
+            if (polygon && pointInPolygon(lat, lng, polygon)) {
+                
                 return Response.json({
                     inside: true,
                     closest: {
@@ -123,7 +147,8 @@ export async function GET(request) {
         let minDistance = Infinity;
 
         for (const fdra of data) {
-            const center = getPolygonCenter(fdra.Map_Poly);
+            const polygon = extractPolygon(fdra.Map_Poly);
+            const center = getPolygonCenter(polygon);
             if (center) {
                 const distance = haversineDistance(lat, lng, center.lat, center.lng); //get dist to center point from location
                 if (distance < minDistance) {

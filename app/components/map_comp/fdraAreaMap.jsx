@@ -80,7 +80,7 @@ export default function FdraMap() {
 
 
   useEffect(() => {
-    fetch('/api/fdra/polygons') //get data from api route created for polygons
+    fetch('./api/fdra/polygons') //get data from api route created for polygons
       .then(res => { //if error with fetch, catch and display error message instead of map
         if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
         return res.json();
@@ -135,7 +135,7 @@ export default function FdraMap() {
       fillColor: fillColor,
       fillOpacity: 0.3,
       color: '#3388FF', //border separating each area
-      weight: 2,
+      weight: 3,
       opacity: 0.8
     });
 

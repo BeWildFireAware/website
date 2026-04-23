@@ -34,7 +34,7 @@ export default function NearestFdra() {
                 console.log('User location:', latitude, longitude);
                 
                 try {
-                    const res = await fetch(`/api/fdra/getClosestFdra?lat=${latitude}&lng=${longitude}`);
+                    const res = await fetch(`./api/fdra/getClosestFdra?lat=${latitude}&lng=${longitude}`);
                     
                     if (!res.ok) {
                         throw new Error(`HTTP error: ${res.status}`);
