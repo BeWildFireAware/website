@@ -1,4 +1,5 @@
 //NEED TO RENAME TO CLIENT, may not use much in future, anon key doesnt pass RLS, and this will run in broswer
+//for admin panels, used in many places such as auth, station search, etc
 import { createClient } from '@supabase/supabase-js'
 
 

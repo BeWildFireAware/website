@@ -6,7 +6,7 @@ trigger db edge fx after confirmation
 */
 import { fetchNFDRData } from '../../lib/NFDRApi.js'
 import { fetchWeatherData } from '../../lib/weatherApi.js'
-import { supabase } from '../../lib/supabase/server.js'
+import { supabase } from '../../lib/supabase'
 
 //search if station exists, if not fetch data and return preview to user for confirmation before db insert and edge fx trigger
 export async function stationSearch(formData) {
