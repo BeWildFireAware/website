@@ -16,6 +16,7 @@ import StatusSection from '../components/StatusSection.jsx'
 import StationSection from '../components/Station/StationSection.jsx'
 */
 // Server action to add a new dispatch area to the database
+/*
 export async function addDispatchArea(formData) {
   // Extract dispatch name from form data
   const dispatchName = formData.get('dispatchName')
@@ -83,12 +84,12 @@ export async function addFDRAData(formData) {
 
   return { success: true, data }
 }
-
+*/
 /**
  * Main page component that fetches and displays wildfire data
  * Fetches dispatch areas and FDRA records from Supabase
  * Displays forms for adding new data and shows current data in cards
- */
+ 
 export default async function Home() {
   // Fetch all dispatch areas from database
   // Fetch all dispatch areas from database
@@ -110,37 +111,37 @@ export default async function Home() {
   // console.log('DispatchArea error:', dispatchError)
   // console.log('FDRA data:', fdraData)
   // console.log('FDRA error:', fdraError)
-
+*//*
   return (
     <main className="dashboard-container">
-      {/* Connection Status */}
+      {/* Connection Status }
       <section className="add-dispatch-section">
         <h2 className="dashboard-heading">Add Dispatch Area</h2>
         <AddDispatchForm />
       </section>
       
-      {/* Connection Status */}
+      {/* Connection Status }
       <section className="add-fdra-section">
         <h2 className="dashboard-heading">Add FDRA</h2>
         <AddFDRAForm dispatchData={dispatchData} />
       </section>
 
-      {/* Connection Status */}
+      {/* Connection Status }
       <DispatchAreasSection dispatchData={dispatchData} dispatchError={dispatchError} />
 
-      {/* FDRA Section */}
+      {/* FDRA Section }
       <FdraSection fdraData={fdraData} fdraError={fdraError} />
-      {/* Stations Section */}
+      {/* Stations Section }
       <StationSection stationData={stationData} stationError={stationError} />
 
-      {/* Connection Status */}
+      {/* Connection Status *}
       <StatusSection dispatchError={dispatchError} fdraError={fdraError} stationError={stationError} />
     </main>
   )
 } 
 
 
-
+*/
 
 
 
