@@ -1,7 +1,7 @@
 //Data Display Page (Will not be used in final build, mainly for troubleshooting)
 
 'use server'
-
+/*
 // Import Supabase client for database operations
 import { supabase } from '@/lib/supabase'
 
@@ -14,7 +14,7 @@ import DispatchAreasSection from '../components/Dispatch/DispatchAreasSection.js
 import FdraSection from '../components/FDRA/FdraSection.jsx'
 import StatusSection from '../components/StatusSection.jsx'
 import StationSection from '../components/Station/StationSection.jsx'
-
+*/
 // Server action to add a new dispatch area to the database
 export async function addDispatchArea(formData) {
   // Extract dispatch name from form data

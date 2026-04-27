@@ -1,13 +1,13 @@
 'use client';
 
 //page to get user input for new stations to add to db, wrapped in refresh provider, which allows for refresh of all needed info
-import { RefreshProvider } from '../../components/contexts/refreshContext.jsx';
-import  StationSearchForm  from '../../components/newStationAdd/stationSearchForm.jsx'
-import FDRASearchForm from '../../components/newFdraAdd/fdraSearchForm.jsx'
+import { RefreshProvider } from '@/app/components/contexts/refreshContext.jsx';
+import  StationSearchForm  from '@/app/components/newStationAdd/stationSearchForm.jsx'
+import FDRASearchForm from '@/app/components/newFdraAdd/fdraSearchForm.jsx'
 import DispatchAreaSearchForm from '@/app/components/newDispatchAreaAdd/dispatchAreaSearchForm.jsx'
 import DispatchAreaTable from '@/app/components/newDispatchAreaAdd/dispatchAreaTable.jsx'
-import  StationTable  from '../components/newStationAdd/stationTable.jsx'; //table to show all stations and their info, also allows for changing fdra assignment of stations
-import useRequireAuth from '../auth/useRequiredAuth.jsx'
+import  StationTable  from '@/app/components/newStationAdd/stationTable.jsx'; //table to show all stations and their info, also allows for changing fdra assignment of stations
+import useRequireAuth from '@/app/auth/useRequiredAuth.jsx'
 import {useRouter } from 'next/navigation'
 
 export default function AddDataPage() {
