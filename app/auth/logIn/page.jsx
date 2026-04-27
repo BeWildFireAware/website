@@ -1,5 +1,5 @@
 'use client';
-
+//handle login of user
 
 import { supabase } from '@/lib/supabase';
 import { useState } from 'react';
@@ -117,29 +117,3 @@ export default function AuthForm() {
     );
 }
 
-
-
-//  <main className="dashboard-container">
-//       {/* Connection Status */}
-//       <section className="add-dispatch-section">
-//         <h2 className="dashboard-heading">Add Dispatch Area</h2>
-//         <AddDispatchForm />
-//       </section>
-      
-//       {/* Connection Status */}
-//       <section className="add-fdra-section">
-//         <h2 className="dashboard-heading">Add FDRA</h2>
-//         <AddFDRAForm dispatchData={dispatchData} />
-//       </section>
-
-//       {/* Connection Status */}
-//       <DispatchAreasSection dispatchData={dispatchData} dispatchError={dispatchError} />
-
-//       {/* FDRA Section */}
-//       <FdraSection fdraData={fdraData} fdraError={fdraError} />
-//       {/* Stations Section */}
-//       <StationSection stationData={stationData} stationError={stationError} />
-
-//       {/* Connection Status */}
-//       <StatusSection dispatchError={dispatchError} fdraError={fdraError} stationError={stationError} />
-//     </main>

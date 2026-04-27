@@ -40,10 +40,11 @@ export default function AdminDashboard() {
                         SIGN UP NEW USERS
                     </button>
                 )}
+                <button onClick={() => router.push('/admin/testEmail')}>
+                    TEST EMAIL
+                </button>
 
-                
-
-                <button onClick={() => router.push('/addNew')}>
+                <button onClick={() => router.push('/admin/addNew')}>
                     ADD NEW DATA
                 </button>
                 <button onClick={() => router.push('/breakpoints')}>

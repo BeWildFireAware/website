@@ -4,7 +4,7 @@ import "./layouts/globals.css";
 import Link from "next/link";
 import DropDownClient from "./components/dropdown_comp/DropDownClient";
 import { GetDropdownData } from "./components/dropdown_comp/GetDropdownData";
-import AuthNav from "./components/authNav"
+// import AuthNav from "./deprecated/authNav"
 import 'leaflet/dist/leaflet.css'; //for map comp 
 
 export const metadata = {
@@ -26,9 +26,7 @@ export default async function RootLayout({ children }) {
           
           <Link href="/"> Home</Link>
           <Link href="/about"> Who We Are</Link>
-          <Link href="/data"> Data</Link>
           <Link href="/learn-more"> Learn More</Link>
-          <Link href="/csvPreview"> CSV Preview</Link>
           <Link href="/map"> View Map</Link>
           <DropDownClient dispatchData={data} />
         </nav>
@@ -40,10 +38,7 @@ export default async function RootLayout({ children }) {
         <nav className="nav-Bar-Bottom">
           <Link href="/"> Home</Link>
           <Link href="/about"> Who We Are</Link>
-          <Link href="/data"> Data</Link>
           <Link href="/learn-more"> Learn More</Link>
-          
-          {/* <AuthNav/> */}
         </nav>
        
           

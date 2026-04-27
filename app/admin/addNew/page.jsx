@@ -1,9 +1,9 @@
 'use client';
 
 //page to get user input for new stations to add to db, wrapped in refresh provider, which allows for refresh of all needed info
-import { RefreshProvider } from '../components/contexts/refreshContext.jsx';
-import  StationSearchForm  from '../components/newStationAdd/stationSearchForm.jsx'
-import FDRASearchForm from '../components/newFdraAdd/fdraSearchForm.jsx'
+import { RefreshProvider } from '../../components/contexts/refreshContext.jsx';
+import  StationSearchForm  from '../../components/newStationAdd/stationSearchForm.jsx'
+import FDRASearchForm from '../../components/newFdraAdd/fdraSearchForm.jsx'
 import DispatchAreaSearchForm from '@/app/components/newDispatchAreaAdd/dispatchAreaSearchForm.jsx'
 import DispatchAreaTable from '@/app/components/newDispatchAreaAdd/dispatchAreaTable.jsx'
 import  StationTable  from '../components/newStationAdd/stationTable.jsx'; //table to show all stations and their info, also allows for changing fdra assignment of stations
@@ -56,7 +56,14 @@ export default function AddDataPage() {
                     <h2>All Dispatch Areas</h2>
                     <DispatchAreaTable/>
                 </div>
+
+                <div className='adminGoBack' >
+                    <Link href="../admin">
+                        ← Back to Admin Dashboard
+                    </Link>
+                </div>
             </div>
+
         </RefreshProvider>
         
     );
