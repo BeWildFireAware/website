@@ -17,6 +17,8 @@ export default function ErcTable({breakpoints, dangerLevels, onChange}){
                                 type="number"
                                 value={bp.Erc_Breakpoint}
                                 onChange={(e) => onChange(index, 'Erc_Breakpoint', e.target.value)}
+                                min="0"
+                                max="500"
                             ></input>
                         </td>
                     </tr>

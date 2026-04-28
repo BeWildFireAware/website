@@ -1,7 +1,8 @@
 'use client';
 import BreakpointTable from '@/app/components/breakpointEdit/breakpointTable.jsx';
-import useRequireAuth from '../auth/useRequiredAuth.jsx'
+import useRequireAuth from '@/app/auth/useRequiredAuth.jsx'
 import {useRouter } from 'next/navigation'
+import Link from 'next/link';
 export default function editBreakpointPage() {
     const router = useRouter();
     //checking if user is logged in
@@ -22,6 +23,13 @@ export default function editBreakpointPage() {
             <h1>Edit Breakpoints</h1>
             
             <BreakpointTable/>
+
+            <div className='adminGoBack' >
+            <Link href="../admin">
+                ← Back to Admin Dashboard
+            </Link>
         </div>
+        </div>
+        
     );
 }   

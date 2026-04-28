@@ -36,9 +36,10 @@ export default function ErcBiTable({breakpoints, dangerLevels, onChange}){
                             <td>
                                 <input
                                     type="number"
-                                    step="0.01"
                                     value={bp.Bi_Breakpoint}
                                     onChange={(e) => onChange(originalIndex, 'Bi_Breakpoint', e.target.value)}
+                                    min="0"
+                                    max="500"
                                 />
                             </td>
                             <td>{dangerLevels[bp.Danger_Level-1]}</td>

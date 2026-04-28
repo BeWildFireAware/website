@@ -9,6 +9,7 @@ import DispatchAreaTable from '@/app/components/newDispatchAreaAdd/dispatchAreaT
 import  StationTable  from '@/app/components/newStationAdd/stationTable.jsx'; //table to show all stations and their info, also allows for changing fdra assignment of stations
 import useRequireAuth from '@/app/auth/useRequiredAuth.jsx'
 import {useRouter } from 'next/navigation'
+import Link from 'next/link';
 
 export default function AddDataPage() {
     const router = useRouter();
