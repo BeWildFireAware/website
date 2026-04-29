@@ -72,13 +72,13 @@ export default function StationTable() {
     };
 
     //move station to new fdra, remove old relationships
-    const handleMoveStation = async (stationId, newFdraId) => {
+    const handleMoveStation = async (stationId, newFdraId, oldFdraId) => {
         if (!newFdraId) return;
         setUpdatingId(stationId);
         setError('');
         setSuccessMessage('');
         try {
-            const result = await moveStationFdra(stationId, newFdraId);
+            const result = await moveStationFdra(stationId, newFdraId, oldFdraId);
             if (result.success) {
                 setSuccessMessage(result.message);
                 triggerRefresh();
@@ -113,14 +113,16 @@ export default function StationTable() {
             <table className="station-table">
                 <thead>
                     <tr>
+                        <th>Station ID</th>
                         <th>Station Name</th>
                         <th>FDRA</th>
-                        <th>Actions</th>
+                        <th>Fuel Model</th>
                     </tr>
                 </thead>
                 <tbody>
                     {stations.map((station) => (
                         <tr key={`${station.ID}-${station.FDRA_ID || 'none'}`}>
+                            <td className="station-id">{station.ID}</td>
                             <td className="station-name">{station.Station_Name}</td>
                             <td className="station-fdra">
                                 {updatingId === station.ID ? (
@@ -131,7 +133,7 @@ export default function StationTable() {
                                             if (actionType === 'add') {
                                                 handleAddRelation(station.ID, newFdraId);
                                             } else if (actionType === 'move') {
-                                                handleMoveStation(station.ID, newFdraId);
+                                                handleMoveStation(station.ID, newFdraId, station.FDRA_ID);
                                             }
                                             setUpdatingId(null);
                                             setActionType(null);
@@ -150,6 +152,9 @@ export default function StationTable() {
                                         {station.FDRAname || 'Unknown'}
                                     </span>
                                 )}
+                            </td>
+                            <td className="station-fuel-model">
+                                {station.Fuel_Model || 'Unknown'}
                             </td>
                             <td className="station-actions">
                                 {updatingId === station.ID ? (

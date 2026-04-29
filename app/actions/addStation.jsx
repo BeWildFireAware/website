@@ -1,3 +1,4 @@
+//server actons for adding, moving, updating stations and checking data
 
 'use server';
 //invocations of supabase fx (posts only) because these are js objects(form submissions)
@@ -7,6 +8,7 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const EDGE_FUNCTION_URL = `${supabaseUrl}/functions/v1/add-station`;  //all actions use same edge fx
 
+//add to db
 export async function addStationToDatabase(stationInfo) {
     console.log('Adding station to database:', stationInfo);
     
@@ -42,7 +44,8 @@ export async function addStationToDatabase(stationInfo) {
             success: true,
             message: result.message || 'Station added successfully',
             stationId: result.stationId ||stationInfo.stationId,
-            backgroundTaskStarted: result.backgroundTaskStarted || false //flag defined in index(backend), to show user data is being added, takes a while(21 years of data)
+            backgroundTaskStarted: result.backgroundTaskStarted || false, //flag defined in index(backend), to show user data is being added, takes a while(21 years of data)
+            
         };
         
     } catch (error) {
@@ -198,7 +201,7 @@ export async function checkStationDataStatus(stationId) {
 }
 
 //change fdra area for station(edge fx), delete old relationships(needed if fdra needs to be deleted)
-export async function moveStationFdra(stationId, newFdraId) {
+export async function moveStationFdra(stationId, newFdraId, oldFdraId) {
     try {
         if (!supabaseUrl || !supabaseAnonKey) {
             throw new Error('Missing Supabase configuration');
@@ -213,7 +216,8 @@ export async function moveStationFdra(stationId, newFdraId) {
             body: JSON.stringify({
                 action: 'moveStationFDRA',
                 stationId: parseInt(stationId),
-                newFdraId: parseInt(newFdraId)
+                newFdraId: parseInt(newFdraId),
+                oldFdraId: parseInt(oldFdraId)
             })
         });
 

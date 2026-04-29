@@ -1,3 +1,4 @@
+//table for dispatch areas
 'use client';
 import { useState, useEffect, use } from 'react';
 import { getDispatchAreas, deleteDispatchAreas } from '../../actions/dispatchAreaActions';

@@ -52,6 +52,9 @@ export default function AdminDashboard() {
                 <button onClick={() => router.push('/admin/addNew')}>
                     ADD NEW DATA
                 </button>
+                <button onClick={() => router.push('/admin/breakpoints')}>
+                    EDIT BREAKPOINTS
+                </button>
             </div>
              <div>
                 {/* view users (admin sees all, editor sees own only) */}

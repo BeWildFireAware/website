@@ -1,3 +1,4 @@
+//table for fdras and fuel models
 'use client';
 import { useState, useEffect } from 'react';
 import { deleteFdra } from '../../actions/fdraActions';
@@ -77,6 +78,7 @@ export default function FdraTable({ fdras, dispatchAreas, onRefresh }) {
                 <thead>
                     <tr>
                         <th>FDRA Name</th>
+                        <th>Fuel Model</th>
                         <th>Dispatch Area</th>
                         <th>Avg ERC</th>
                         <th>Avg BI</th>
@@ -88,6 +90,9 @@ export default function FdraTable({ fdras, dispatchAreas, onRefresh }) {
                         <tr key={fdra.FDRA_ID}>
                             <td className="fdra-name">
                                 {fdra.FDRAname}
+                            </td>
+                            <td className="fuel-model">
+                                {fdra.Fuel_Model}
                             </td>
                             <td className="dispatch-area">
                                 {getDispatchAreaName(fdra.Dispatch_ID)}

@@ -1,4 +1,5 @@
-// /app/api/fdraOptions/route.js
+// Next.js API route to fetch all FDRA options for dropdowns and displays
+
 import { createClient } from '@supabase/supabase-js'
 
 export async function GET() {
@@ -30,7 +31,7 @@ export async function GET() {
         
         const { data, error } = await supabase
             .from('FDRA')
-            .select('FDRA_ID, FDRAname')  // Select all to see what columns exist
+            .select('FDRA_ID, FDRAname, Fuel_Model')  // Select all to see what columns exist
             .order('FDRAname')
             
 
