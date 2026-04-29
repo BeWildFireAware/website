@@ -36,13 +36,18 @@ export default function AdminDashboard() {
 
             <div className='adminDash'>
                 {isAdmin && (
+                    <>
                     <button onClick={() => router.push('/auth/signUp')}>
                         SIGN UP NEW USERS
                     </button>
+                    
+                    <button onClick={() => router.push('/admin/testEmail')}>
+                        TEST EMAIL
+                    </button>
+                    </>
                 )}
-                <button onClick={() => router.push('/admin/testEmail')}>
-                    TEST EMAIL
-                </button>
+
+                
 
                 <button onClick={() => router.push('/admin/addNew')}>
                     ADD NEW DATA

@@ -58,6 +58,16 @@ export async function POST(request) {
             html: html || '<strong>Test email sent!</strong>',
         });
 
+        // Check if Resend returned an error in the response
+        if (data.error) {
+            console.error('Resend API Error:', data.error);
+            return Response.json({
+                success: false,
+                error: data.error.message,
+                data
+            }, { status: data.error.statusCode || 500 });
+        }
+
         console.log('Email sent successfully to', recipients.length, 'recipients:', data);
         return Response.json({
             success: true,
