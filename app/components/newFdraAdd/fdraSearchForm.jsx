@@ -145,7 +145,8 @@ export default function FdraSearchForm() {
                             placeholder="Enter FDRA name (e.g., Northern Rockies)"
                             disabled={isLoading}
                         />
-                        <small>Minimum 2 characters, maximum 50 characters</small>
+                        <p>Minimum 2 characters, maximum 50 characters</p>
+                        <label htmlFor="fuelModel">Fuel Model:</label>
                         <select
                             id="fuelModel"
                             value={fuelModel}
@@ -158,7 +159,7 @@ export default function FdraSearchForm() {
                             <option value="Y">Y</option>
                             <option value="Z">Z</option>
                         </select>
-                        <small>Fuel model determines NFDRS fire danger data</small>
+                        <p>Fuel model determines NFDRS fire danger data</p>
                     </div>
                     
                     <div className="form-group">

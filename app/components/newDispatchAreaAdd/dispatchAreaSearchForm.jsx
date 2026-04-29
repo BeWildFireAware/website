@@ -76,18 +76,20 @@ export default function DispatchAreaSearchForm(){
                         placeholder="Enter dispatch area name"
                     />
                     
-                    <label htmlFor="useBi">
-                        <input 
-                            type="checkbox"
-                            id="useBi"
-                            checked={useBi}
-                            onChange={(e) => setUseBi(e.target.checked)}
-                        />
-                        use BI+ERC: 
-                    </label> 
-                    <small> if checked this area will use ERC+BI to calculate breakpoints</small>
+                    
                 </div>
-                
+                <div className="form-group">
+                    <label htmlFor="useBi">
+                            <input 
+                                type="checkbox"
+                                id="useBi"
+                                checked={useBi}
+                                onChange={(e) => setUseBi(e.target.checked)}
+                            />
+                            use BI+ERC: 
+                        </label> 
+                        <small> if checked this area will use ERC+BI to calculate breakpoints</small>
+                </div>
 
                 {error && <div className="error-message">{error}</div>}
                 {message && <div className="success-message">{message}</div>}

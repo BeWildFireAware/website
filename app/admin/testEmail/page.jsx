@@ -72,10 +72,6 @@ export default function TestEmail() {
 
         //send email of danger levels to all verified users in database, or to specific email if provided, using resend email API route
 
-    
-
-
-
     const sendTestEmail = async () => {
         setLoading(true);
         setResult('');

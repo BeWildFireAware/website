@@ -2,7 +2,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import "./dangerList.css"; //basic css for the extreme danger list, can be adjusted as needed, moved to globals
+//import "./dangerList.css"; //basic css for the extreme danger list, can be adjusted as needed, moved to globals
 // Component to display list of areas currently at extreme danger level
 export default function ExtremeDangerList() {
     const [extremeFdras, setExtremeFdras] = useState([]);

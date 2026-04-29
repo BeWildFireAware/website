@@ -117,6 +117,7 @@ export default function StationTable() {
                         <th>Station Name</th>
                         <th>FDRA</th>
                         <th>Fuel Model</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>

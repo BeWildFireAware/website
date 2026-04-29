@@ -2,7 +2,7 @@
 'use client'
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import "./nearestFdra.css"; //basic css for the nearest fdra component, can be adjusted as needed
+//import "./nearestFdra.css"; //basic css for the nearest fdra component, can be adjusted as needed
 
 const dangerLevelColors = { //fire danger level to color mapping, can be adjusted as needed
     'Low': '#2ecc71',

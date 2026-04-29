@@ -1,5 +1,4 @@
-/* ================= ROOT ================= */
-
+/* ================= ROOT & BASE ================= */
 body {
   margin: 0;
   font-family: sans-serif;
@@ -7,25 +6,20 @@ body {
   color: #FFF;
   flex-direction: column;
 }
+
 html {
   height: 100%;
   background-color: #09240f;
 }
 
-
 /* ================= LAYOUT ================= */
-
 .dashboard-container {
   min-height: 100vh;
   padding: 1.5rem;
   background-color: darkgray;
-
-
 }
 
-
 /* ================= HEADINGS ================= */
-
 .dashboard-title {
   font-size: 2rem;
   font-weight: 700;
@@ -44,29 +38,13 @@ html {
   margin-bottom: 0.5rem;
 }
 
-/* ================= SECTIONS ================= */
-
-.DispatchArea-section,
-.status-section,
-.FDRA-section {
-  color: rgb(0, 0, 0);
-  margin-bottom: 3rem;
-}
-
-.record-count {
-  margin-bottom: 1rem;
-  font-weight: 500;
-}
-
 /* ================= CARDS ================= */
-
 .cards-grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 1rem;
   color: black;
 }
-
 
 .area-card {
   background-color: #b0d7ff;
@@ -75,56 +53,7 @@ html {
   padding: 1rem;
 }
 
-/* ================= STATUS ================= */
-
-.status-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
-  border-radius: 20px;
-  border: 4px solid red;
-  background-color: darkred;
-}
-
-
-.status-card {
-  padding: 1.25rem;
-  border-radius: 0.5rem;
-  border: 1px solid;
-}
-
-.status-success {
-  background-color: #79ffc0;
-  border-color: #00ff5e;
-}
-
-.status-error {
-  background-color: #fef2f2;
-  border-color: #fca5a5;
-}
-
-.status-text-success {
-  color: #15803d;
-  font-weight: 600;
-  font-size: large;
-}
-
-.status-text-error {
-  color: #b91c1c;
-  font-weight: 600;
-}
-
-.status-DispatchArea,
-.status-FDRA,
-.status-StationRecord {
-  font-size: larger;
-  margin-top: 0.5rem;
-  font-weight: 700;
-
-}
-
 /* ================= ERROR ================= */
-
 .error-message {
   background-color: #e67171;
   border: 1px solid #fca5a5;
@@ -142,12 +71,9 @@ html {
 }
 
 /* ================= UTIL ================= */
-
 p {
   margin: 0.25rem 0;
 }
-
-/* app/globals.css - Add these custom classes */
 
 /* Dashboard Container */
 .dashboard-container {
@@ -164,22 +90,16 @@ p {
 
 /* Typography */
 .dashboard-title {
-  font-size: 1.875rem; /* text-3xl */
+  font-size: 1.875rem;
   font-weight: 700;
   margin-bottom: 1.5rem;
   color: black;
 }
 
 .dashboard-heading {
-  font-size: 1.5rem; /* text-2xl */
+  font-size: 1.5rem;
   font-weight: 700;
   margin-bottom: 1rem;
-  color: black;
-}
-
-.dashboard-subheading {
-  font-size: 1.125rem; /* text-lg */
-  font-weight: 600;
   color: black;
 }
 
@@ -199,115 +119,6 @@ p {
   .cards-grid {
     grid-template-columns: repeat(3, 1fr);
   }
-}
-
-.area-card {
-  background-color: #f9fafb; /* gray-50 */
-  border: 1px solid #d1d5db; /* gray-300 */
-  border-radius: 0.5rem;
-  padding: 1rem;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-}
-
-/* Table */
-.data-table {
-  min-width: 100%;
-  background-color: #f9fafb;
-  border: 1px solid #d1d5db;
-}
-
-.data-table thead {
-  background-color: #e5e7eb; /* gray-200 */
-}
-
-.data-table th {
-  padding: 0.75rem 1rem;
-  border: 1px solid #d1d5db;
-  text-align: left;
-  color: black;
-  font-weight: 600;
-}
-
-.data-table td {
-  padding: 0.5rem 1rem;
-  border: 1px solid #d1d5db;
-  color: black;
-}
-
-.data-table tr:hover {
-  background-color: #f3f4f6; /* gray-100 */
-}
-
-/* Status Cards */
-.status-container {
-  background-color: #f3f4f6; /* gray-100 */
-  padding: 1.5rem;
-  border-radius: 0.5rem;
-  border: 1px solid #d1d5db;
-  margin-top: 2rem;
-}
-
-.status-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1.5rem;
-}
-
-@media (min-width: 768px) {
-  .status-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-.status-card {
-  padding: 1rem;
-  border-radius: 0.5rem;
-  border: 1px solid;
-}
-
-.status-success {
-  background-color: #d1fae5; /* green-100 */
-  border-color: #86efac; /* green-300 */
-}
-
-.status-error {
-  background-color: #fee2e2; /* red-100 */
-  border-color: #fca5a5; /* red-300 */
-}
-
-.status-text-success {
-  color: #15803d; /* green-700 */
-}
-
-.status-text-error {
-  color: #b91c1c; /* red-700 */
-}
-
-/* Summary Cards */
-.summary-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
-  margin-top: 1.5rem;
-}
-
-@media (min-width: 640px) {
-  .summary-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (min-width: 1024px) {
-  .summary-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-.summary-card {
-  background-color: white;
-  padding: 1rem;
-  border-radius: 0.25rem;
-  border: 1px solid #d1d5db;
 }
 
 /* Utility Classes */
@@ -387,14 +198,13 @@ p {
   color: #92400e;
 }
 
-/* NAV BAR+ Page*/
-
+/* ================= NAV BAR ================= */
 .page-container {
   margin: 0px;
   border-radius: 0px;
   padding: 25px;
   min-height: calc(100vh-120px);
-  background-color: #0F2311;
+  background-color: #134023;
   flex: 1;
 }
 
@@ -402,58 +212,57 @@ p {
   display: flex;
   justify-content: center;
   gap: 15px;
-  background-color: #0B3D12;
+  background-color: #347338;
   padding: 10px;
-    
 }
 
 .nav-Bar-Top {
   display: flex;
   justify-content: right;
   gap: 25px;
-  background-color: #0B3D12;
-  padding:30px;
-  color:#FFFFFF;
+  background-color: #347338;
+  padding: 30px;
+  color: #FFFFFF;
   text-decoration: none;
-}
-/* Add these rules to target the links */
-.nav-Bar-Top a,
-.nav-Bar-Bottom a {
-  color: #FFFFFF !important; /* Force white color */
-  text-decoration: none; /* Remove underline */
+  position: relative;
 }
 
-/* Add visited/link states */
+/* Navbar links */
+.nav-Bar-Top a,
+.nav-Bar-Bottom a {
+  color: #FFFFFF;
+  text-decoration: none;
+  text-align: center;
+}
+
 .nav-Bar-Top a:visited,
 .nav-Bar-Bottom a:visited,
 .nav-Bar-Top a:link,
-.nav-Bar-Bottom a:link
-{
-  color: #FFFFFF !important;
+.nav-Bar-Bottom a:link {
+  color: #FFFFFF;
 }
+
 .nav-Bar-Top ul li a:active,
-.nav-Bar-Bottom a:active{
+.nav-Bar-Bottom a:active {
   color: #FF6600 !important;
-  
 }
 
 .contact-info {
   text-align: center;
   padding: 20px;
-  background-color: orange; /* Same as page container */
+  background-color: #DA9365;
   color: black;
   margin: 0;
 }
 
 .logo-navbar {
   position: absolute;
-  left: 15px; /* Position from left edge */
-  top: 0.5%;
-  
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
-/* homepage */
-
+/* Homepage */
 .homepage-header {
   text-align: center;
   font-size: larger;
@@ -461,83 +270,35 @@ p {
   padding-bottom: 100px;
   min-height: 300px;
   min-width: 300px;
-  color: white;
-  text-shadow: 5px 5px 5px black;
+  text-shadow: 1px 1px 10px black;
   background-image: url('/images/Copper_Lake_Trail,_Crested_Butte.jpg');
-  background-position: center;   /* keeps image centered */
-  background-size: cover;        /* fills nicely */;
+  background-position: center;
+  background-size: cover;
+  box-shadow: #000000 0px 0px 20px 10px;
 }
 
-
-
-/* map page */
-.map-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 0;
-}
-
-/* ================= CSV DISPLAY ================= */
-
-.csv-container {
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-	gap: 20px;
-	padding: 20px;
-}
-
-.csv-card {
-	border: 1px solid #ddd;
-	border-radius: 8px;
-	padding: 16px;
-	background: white;
-	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.csv-row {
-	margin-bottom: 10px;
-	font-size: 14px;
-	line-height: 1.5;
-}
-
-
-.csv-container,
-.csv-card,
-.csv-row {
-  color: #000;
-}
-
-/*dropdown :( */
-/* ================= DROPDOWN STYLES ================= */
-
-/* Dropdown Container */
+/* ================= DROPDOWN STYLES (FIXED) ================= */
 .dropdown-container {
   position: relative;
   display: inline-block;
+  text-align: center;
 }
 
-/* Dropdown Trigger Button */
 .dropdown-trigger {
   background: none;
   border: none;
-  color: #FFFFFF !important; /* Match navbar text color */
+  color: #FFFFFF;
   font: inherit;
   cursor: pointer;
-  padding: 0.5rem 1rem;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  transition: background-color 0.2s;
   text-decoration: none !important;
 }
 
-/* Match the hover state of other navbar links */
 .dropdown-trigger:hover {
   background-color: rgba(255, 255, 255, 0.1);
 }
 
-/* Keep white color for visited/active states */
 .dropdown-trigger:visited,
 .dropdown-trigger:link,
 .dropdown-trigger:active {
@@ -545,12 +306,11 @@ p {
 }
 
 .dropdown-trigger:active {
-  color: #FF6600 !important; /* Match your active link color */
+  color: #FF6600 !important;
 }
 
-/* Dropdown Arrow */
 .dropdown-arrow {
-  font-size: 0.7rem;
+  font-size: 13px;
   transition: transform 0.2s;
   color: #FFFFFF;
 }
@@ -559,33 +319,28 @@ p {
   transform: rotate(180deg);
 }
 
-/* Dropdown Menu */
 .dropdown-menu {
   position: absolute;
-  top: 100%;
   right: 0;
-  background: #0B3D12; /* Match navbar background color */
+  background: #0B3D12;
   min-width: 280px;
   max-height: 70vh;
   overflow-y: auto;
-  border: 1px solid #1a4720; /* Slightly lighter border */
   border-radius: 4px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 10px 10px black;
   z-index: 1000;
-  margin-top: 0.25rem;
 }
 
-/* Scrollbar styling for dropdown */
 .dropdown-menu::-webkit-scrollbar {
-  width: 8px;
+  width: 10px;
 }
 
 .dropdown-menu::-webkit-scrollbar-track {
-  background: #0a3511;
+  background: #0B3D12;
 }
 
 .dropdown-menu::-webkit-scrollbar-thumb {
-  background: #1a4720;
+  background: #347338;
   border-radius: 4px;
 }
 
@@ -593,78 +348,76 @@ p {
   background: #205a28;
 }
 
-/* Dispatch Group */
-.dispatch-group {
-  border-bottom: 1px solid #1a4720;
-}
-
-.dispatch-group:last-child {
-  border-bottom: none;
-}
-
-/* Dispatch Header */
 .dispatch-header {
-  padding: 0.75rem 1rem;
+  padding: 15px 10px;
   font-weight: 600;
-  color: #FFFFFF; /* White text */
-  background: #0a3511; /* Slightly darker than navbar */
-  border-bottom: 1px solid #1a4720;
-  font-size: 0.95rem;
+  color: #FFFFFF;
+  background: #205a28;
+  border-bottom: 2px solid #1a4720;
+  font-size: 20px;
 }
 
-/* FDRA List Container */
+/* FDRA List inside dropdown - FIXED visibility */
 .fdra-list {
   padding: 0.5rem 0;
-  background: #0B3D12; /* Match navbar background */
+  background: #205a28;
 }
 
-/* FDRA Links */
-.fdra-link {
-  display: block;
-  padding: 0.6rem 1rem 0.6rem 2rem;
-  color: #E8F5E9 !important; /* Light greenish-white */
-  text-decoration: none !important;
-  transition: all 0.2s;
-  border-left: 3px solid transparent;
-  font-size: 0.9rem;
-}
-
-/* Match your link color states */
-.fdra-link:visited,
-.fdra-link:link {
+/* FDRA Links in dropdown - VISIBLE AND WORKING */
+.dropdown-menu .fdra-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 4px 5px 10px;
   color: #E8F5E9 !important;
+  background-color: #525B02;
+  text-decoration: none !important;
+  border: #000000 1px solid;
 }
 
-.fdra-link:hover {
+.dropdown-menu .fdra-link:hover {
   background-color: rgba(255, 255, 255, 0.08);
   color: #FFFFFF !important;
-  border-left-color: #4CAF50; /* Green accent border on hover */
 }
 
-.fdra-link:active {
-  color: #FF6600 !important; /* Match your active link color */
+.dropdown-menu .fdra-link:active {
+  color: #FF6600 !important;
   background-color: rgba(255, 102, 0, 0.1);
 }
 
-/* Loading/Empty States */
+.fdra-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: inherit;
+}
+
+.fdra-badge {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  background: #d7150f;
+  color: white;
+  border-radius: 12px;
+  letter-spacing: 0.3px;
+}
+
 .dropdown-empty,
 .fdra-empty {
   padding: 1.5rem;
-  color: #B0BEC5 !important; /* Light gray for empty states */
+  color: #B0BEC5 !important;
   font-style: italic;
   text-align: center;
   background: #0B3D12;
 }
 
-/* No FDRAs message */
 .fdra-empty {
   padding: 0.75rem 1rem;
   color: #90A4AE !important;
   font-size: 0.85rem;
 }
 
-/* ================= RESPONSIVE DROPDOWN ================= */
-
+/* Responsive Dropdown */
 @media (max-width: 768px) {
   .dropdown-menu {
     position: fixed;
@@ -679,6 +432,217 @@ p {
     padding: 0.5rem 0.75rem;
     font-size: 0.9rem;
   }
+}
+
+/* ================= EXTREME DANGER LIST CONTAINER ================= */
+.extreme-danger-container {
+  margin: 24px 0;
+  max-width: 500px;
+  background: #fff5f5;
+  border: 2px solid #0a0a0a;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(223, 9, 9, 0.15);
+}
+
+.extreme-danger-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #d7150f 0%, #137829 100%);
+  color: white;
+}
+
+.extreme-danger-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.extreme-icon {
+  font-size: 20px;
+}
+
+.extreme-count {
+  margin-left: auto;
+  background: rgba(255, 255, 255, 0.25);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.extreme-danger-content {
+  padding: 16px 20px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.dispatch-group {
+  margin-bottom: 20px;
+}
+
+.dispatch-group:last-child {
+  margin-bottom: 0;
+}
+
+.dispatch-title {
+  margin: 0 0 10px 0;
+  padding-bottom: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #555;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+/* FDRA Links inside extreme danger container */
+.extreme-danger-container .fdra-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: white;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border: 1px solid #f0e6f4;
+}
+
+.extreme-danger-container .fdra-link:hover {
+  background: #f3e5f5;
+  border-color: #cb1818;
+  transform: translateX(2px);
+}
+
+.extreme-danger-container .fdra-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.extreme-danger-container .fdra-badge {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  background: #d7150f;
+  color: white;
+  border-radius: 12px;
+  letter-spacing: 0.3px;
+}
+
+/* States */
+.extreme-loading,
+.extreme-error,
+.extreme-none {
+  padding: 20px;
+  text-align: left;
+  font-size: 14px;
+  color: #666;
+}
+
+.extreme-none {
+  color: #28a745;
+  font-weight: 500;
+}
+
+.extreme-error {
+  color: #dc3545;
+}
+
+/* Scrollbar */
+.extreme-danger-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.extreme-danger-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.extreme-danger-content::-webkit-scrollbar-thumb {
+  background: #ce93d8;
+  border-radius: 10px;
+}
+
+.extreme-danger-content::-webkit-scrollbar-thumb:hover {
+  background: #ab47bc;
+}
+
+/* ================= CLOSEST FDRA CONTAINER ================= */
+.closest-fdra-container {
+  margin: 24px 0;
+  max-width: 500px;
+  background: rgb(128, 145, 128);
+  border: 2px solid #000000;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  color: #333;
+}
+
+.closest-fdra-container h3 {
+  margin: 0;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #30b540 0%, #a24b4b 100%);
+  color: rgb(0, 0, 0);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.closest-fdra-container p {
+  color: #ffffff;
+}
+
+.closest-fdra-details {
+  padding: 16px 20px;
+}
+
+.closest-fdra-container .fdra-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-decoration: none;
+  color: inherit;
+}
+
+.fdra-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.closest-fdra-container .fdra-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.fdra-dispatch {
+  font-size: 13px;
+  color: #666;
+}
+
+.danger-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.danger-color-block {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+.danger-level-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
 }
 
 /* ================= ADMIN ================= */
@@ -734,19 +698,7 @@ p {
   padding: 0.95rem 1rem;
   border-radius: 0.75rem;
   background-color: blue;
-  color: #ffffff;
   font-weight: 700;
-}
-
-
-
-
-.error-message {
-  background-color: #fee2e2;
-  border: 1px solid #fca5a5;
-  border-radius: 0.75rem;
-  padding: 0.85rem 1rem;
-  color: #991b1b;
 }
 
 .success-message {
@@ -778,14 +730,14 @@ p {
   cursor: pointer;
 }
 
-.userTable{
+.userTable {
   min-width: 100%;
   background-color: #f9fafb;
   border: 1px solid #d1d5db;
 }
 
 .userTable thead {
-  background-color: #e5e7eb; /* gray-200 */
+  background-color: #e5e7eb;
 }
 
 .userTable th {
@@ -802,24 +754,23 @@ p {
   color: black;
 }
 
-.adminDash{
-  display: 'flex';
-  gap: '10px';
-  flex-wrap: 'wrap';
-  margin-top: '10px'
+.adminDash {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
 }
+
 .adminGoBack {
-  display: inline-block;  
+  display: inline-block;
   margin-top: 20px;
-  background-color: yellow;
+  background-color: #f3f4f6;
   color: black;
-  padding: 5px 10px;      
+  padding: 5px 10px;
 }
 
-/* ================= email ================= */
-
-/* FireAlert component - simple solid colors */
-.test-email-form{
+/* ================= EMAIL SECTION ================= */
+.test-email-form {
   display: flex;
   flex-direction: column;
   max-width: 400px;
@@ -827,11 +778,11 @@ p {
   margin: 0 auto;
   padding: 20px;
   border-radius: 8px;
-  border: 5px solid #00ff5e; /* Green border for testing */
-  color: black
+  border: 5px solid #00ff5e;
+  color: black;
 }
 
-.Fire_dangers_email{
+.Fire_dangers_email {
   display: flex;
   flex-direction: column;
   max-width: 600px;
@@ -842,13 +793,13 @@ p {
   color: black;
 }
 
-.danger_email_cards{
-  background-color: black; /* gray-50 */
-  border: 1px solid #d1d5db; /* gray-300 */
+.danger_email_cards {
+  background-color: black;
+  border: 1px solid #d1d5db;
   border-radius: 0.5px;
   padding: 1rem;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  color:white
+  color: white;
 }
 
 .fire-alert-card {
@@ -862,7 +813,6 @@ p {
   margin-top: 0;
   font-size: 1.5px;
   font-weight: bold;
-  
 }
 
 .fire-alert-details {
@@ -884,7 +834,7 @@ p {
   font-size: 16px;
   font-weight: bold;
   color: white;
-  background-color: #666;           /* fallback color */
+  background-color: #666;
 }
 
 .send-alert-btn:disabled {
@@ -908,3 +858,86 @@ p {
   border: 1px solid red;
   color: black;
 }
+
+.add-station-section,
+.all-stations-section,
+.add-fdra-section,
+.add-dispatch-area-section,
+.all-dispatch-areas-section,
+.station-preview-container{
+  background-color: #09240f;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  padding: 15px 10px;
+  margin-bottom: 20px;
+}
+
+
+.all-stations-section h3, .add-station-section h3, .add-fdra-section h3, .add-dispatch-area-section h3, .all-dispatch-areas-section h3 {
+  text-align: center;
+}
+
+.add-station-section h2, .all-stations-section h2, .add-fdra-section h2, .add-dispatch-area-section h2, .all-dispatch-areas-section h2 {
+  color: #FFFFFF;
+  border-bottom: #0B3D12 5px solid;
+  text-align: center;
+
+}
+
+.station-preview-header {
+  background-color: #0B3D12;
+  color: #FFFFFF;
+  padding: 10px;
+  border-bottom: 2px solid #d1d5db;
+}
+
+.station-preview-table,
+.station-table,
+.fdra-table,
+.dispatch-area-table
+ {
+  width: 75%;
+  border-collapse: collapse;
+  background: #347338;/*same as navbar*/
+  color: black;
+  margin: 0 auto;
+}
+
+/* Header */
+.station-preview-table thead,
+.station-table thead,
+.fdra-table thead,
+.dispatch-area-table thead {
+  background: #347338;
+  color: white;
+}
+
+.station-preview-table th,
+.station-table th,
+.fdra-table th,
+.dispatch-area-table th {
+  padding: 12px;
+  text-align: left;
+  font-weight: 600;
+  background-color: #A5BF99;
+}
+
+/* Cells */
+.station-preview-table td,
+.station-table td,
+.fdra-table td,
+.dispatch-area-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid darkgreen;
+}
+
+
+/* Zebra striping */
+.station-preview-table tbody tr:nth-child(even),
+.station-table tbody tr:nth-child(even),
+.fdra-table tbody tr:nth-child(even),
+.dispatch-area-table tbody tr:nth-child(even) {
+  background: #a9e6c7;
+}
+
+

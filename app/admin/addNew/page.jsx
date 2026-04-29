@@ -29,31 +29,32 @@ export default function AddDataPage() {
     return (
         <RefreshProvider>
             <div className="add-data-page">
-                <div className="add-station-section">
-                    <button onClick={() => router.push('/admin')}>
+                <button onClick={() => router.push('/admin')}>
                         Admin Dashboard
-                    </button>
-                    <h2>Add New Station</h2>
-                    <p>Enter the new station ID, fuel model, and fdra it belongs to</p>
+                </button>
+
+                <div className="add-station-section">
                     
+                    <h2>Add New Station</h2>
+                    <h3>Enter the new station ID, fuel model, and fdra it belongs to</h3>
                     <StationSearchForm />
                 </div>
-                <div>
+                <div className="all-stations-section">
                     <h2>All Stations</h2>
                     <StationTable />
                 </div>
-                <div>
+                <div className="add-fdra-section">
                     <h2>Add New FDRA</h2>
-                    <p>Enter the new FDRA name and dispatch area it belongs to</p>
+                    <h3>Enter the new FDRA name and dispatch area it belongs to</h3>
                     <FDRASearchForm />
                 </div>
             
-                <div>
+                <div className="add-dispatch-area-section">
                     <h2>Add New Dispatch Area</h2>
-                    <p>Enter the new dispatch area name</p>
+                    <h3>Enter the new dispatch area name</h3>
                     <DispatchAreaSearchForm/>
                 </div>
-                <div>
+                <div className="all-dispatch-areas-section">
                     <h2>All Dispatch Areas</h2>
                     <DispatchAreaTable/>
                 </div>
