@@ -70,7 +70,7 @@ export default function DispatchDropdown({ dispatchData }) {
                   (
                     dispatch.fdrAs.map((fdra) =>   
                     (
-                      <Link className="fdra-link" key={fdra.id} href={`/fdra/${fdra.id}`} onClick={() => setIsOpen(false)} // Close dropdown when link is clicked, link to fdra page with id to render template
+                      <Link className="dropdown-link" key={fdra.id} href={`/fdra/${fdra.id}`} onClick={() => setIsOpen(false)} // Close dropdown when link is clicked, link to fdra page with id to render template
                       >{fdra.name}</Link>
                     )
                     )

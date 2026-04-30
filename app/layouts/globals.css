@@ -401,40 +401,44 @@ p {
 .nav-Bar-Bottom {
   display: flex;
   justify-content: center;
-  gap: 15px;
+  gap: 30px;
   background-color: #0B3D12;
   padding: 10px;
     
 }
 
 .nav-Bar-Top {
-  display: flex;
-  justify-content: right;
-  gap: 25px;
+  padding: 30px;
   background-color: #0B3D12;
-  padding:30px;
-  color:#FFFFFF;
-  text-decoration: none;
-}
-/* Add these rules to target the links */
-.nav-Bar-Top a,
-.nav-Bar-Bottom a {
-  color: #FFFFFF !important; /* Force white color */
-  text-decoration: none; /* Remove underline */
+  display: flex;
 }
 
-/* Add visited/link states */
+.logo-navbar {
+  display: flex;
+  align-items: center;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  gap: 30px;
+}
+
+.nav-links a,
+.nav-links button {
+  display: flex;
+  color: white;
+  text-decoration: none;
+}
+
 .nav-Bar-Top a:visited,
 .nav-Bar-Bottom a:visited,
 .nav-Bar-Top a:link,
 .nav-Bar-Bottom a:link
 {
   color: #FFFFFF !important;
-}
-.nav-Bar-Top ul li a:active,
-.nav-Bar-Bottom a:active{
-  color: #FF6600 !important;
-  
+  text-decoration: none;
 }
 
 .contact-info {
@@ -521,23 +525,22 @@ p {
 .dropdown-trigger {
   background: none;
   border: none;
-  color: #FFFFFF !important; /* Match navbar text color */
+  color: #FFFFFF !important;
   font: inherit;
   cursor: pointer;
   padding: 0.5rem 1rem;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 6px;
+  height: 100%;
   transition: background-color 0.2s;
   text-decoration: none !important;
 }
 
-/* Match the hover state of other navbar links */
 .dropdown-trigger:hover {
   background-color: rgba(255, 255, 255, 0.1);
 }
 
-/* Keep white color for visited/active states */
 .dropdown-trigger:visited,
 .dropdown-trigger:link,
 .dropdown-trigger:active {
@@ -545,13 +548,13 @@ p {
 }
 
 .dropdown-trigger:active {
-  color: #FF6600 !important; /* Match your active link color */
+  color: #FF6600 !important;
 }
 
 /* Dropdown Arrow */
 .dropdown-arrow {
   font-size: 0.7rem;
-  transition: transform 0.2s;
+  transition: transform 0.2s ease;
   color: #FFFFFF;
 }
 
@@ -562,20 +565,36 @@ p {
 /* Dropdown Menu */
 .dropdown-menu {
   position: absolute;
-  top: 100%;
+  top: 105%;
   right: 0;
-  background: #0B3D12; /* Match navbar background color */
-  min-width: 280px;
+  background: #0B3D12;
+  min-width: 260px;
   max-height: 70vh;
   overflow-y: auto;
-  border: 1px solid #1a4720; /* Slightly lighter border */
-  border-radius: 4px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  border: 1px solid #1a4720;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
   z-index: 1000;
-  margin-top: 0.25rem;
+  padding: 0.5rem 0;
+
+  /* animation */
+  animation: dropdownFade 0.15s ease-out;
+  transform-origin: top right;
 }
 
-/* Scrollbar styling for dropdown */
+/* Animation */
+@keyframes dropdownFade {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Scrollbar styling */
 .dropdown-menu::-webkit-scrollbar {
   width: 8px;
 }
@@ -593,7 +612,51 @@ p {
   background: #205a28;
 }
 
-/* Dispatch Group */
+/* ================= SIMPLE DROPDOWN LINKS (Learn More) ================= */
+
+.dropdown-link {
+  display: block;
+  padding: 0.7rem 1rem;
+  color: #E8F5E9 !important;
+  text-decoration: none !important;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+}
+
+.dropdown-link:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  padding-left: 1.25rem;
+  border-left-color: #4CAF50;
+  color: #FFFFFF !important;
+}
+
+.dropdown-link:active {
+  color: #FF6600 !important;
+  background-color: rgba(255, 102, 0, 0.1);
+}
+
+.dropdown-link + .dropdown-link {
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* ================= OPTIONAL SECTION GROUPING ================= */
+
+.dropdown-section {
+  padding: 0.25rem 0;
+}
+
+.dropdown-section-title {
+  padding: 0.5rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #A5D6A7;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ================= EXISTING DISPATCH DROPDOWN ================= */
+
 .dispatch-group {
   border-bottom: 1px solid #1a4720;
 }
@@ -602,34 +665,30 @@ p {
   border-bottom: none;
 }
 
-/* Dispatch Header */
 .dispatch-header {
   padding: 0.75rem 1rem;
   font-weight: 600;
-  color: #FFFFFF; /* White text */
-  background: #0a3511; /* Slightly darker than navbar */
+  color: #FFFFFF;
+  background: #0a3511;
   border-bottom: 1px solid #1a4720;
   font-size: 0.95rem;
 }
 
-/* FDRA List Container */
 .fdra-list {
   padding: 0.5rem 0;
-  background: #0B3D12; /* Match navbar background */
+  background: #0B3D12;
 }
 
-/* FDRA Links */
 .fdra-link {
   display: block;
   padding: 0.6rem 1rem 0.6rem 2rem;
-  color: #E8F5E9 !important; /* Light greenish-white */
+  color: #E8F5E9 !important;
   text-decoration: none !important;
   transition: all 0.2s;
   border-left: 3px solid transparent;
   font-size: 0.9rem;
 }
 
-/* Match your link color states */
 .fdra-link:visited,
 .fdra-link:link {
   color: #E8F5E9 !important;
@@ -638,32 +697,31 @@ p {
 .fdra-link:hover {
   background-color: rgba(255, 255, 255, 0.08);
   color: #FFFFFF !important;
-  border-left-color: #4CAF50; /* Green accent border on hover */
+  border-left-color: #4CAF50;
 }
 
 .fdra-link:active {
-  color: #FF6600 !important; /* Match your active link color */
+  color: #FF6600 !important;
   background-color: rgba(255, 102, 0, 0.1);
 }
 
-/* Loading/Empty States */
+/* Empty states */
 .dropdown-empty,
 .fdra-empty {
   padding: 1.5rem;
-  color: #B0BEC5 !important; /* Light gray for empty states */
+  color: #B0BEC5 !important;
   font-style: italic;
   text-align: center;
   background: #0B3D12;
 }
 
-/* No FDRAs message */
 .fdra-empty {
   padding: 0.75rem 1rem;
   color: #90A4AE !important;
   font-size: 0.85rem;
 }
 
-/* ================= RESPONSIVE DROPDOWN ================= */
+/* ================= RESPONSIVE ================= */
 
 @media (max-width: 768px) {
   .dropdown-menu {
@@ -674,7 +732,7 @@ p {
     max-width: 300px;
     max-height: 60vh;
   }
-  
+
   .dropdown-trigger {
     padding: 0.5rem 0.75rem;
     font-size: 0.9rem;
@@ -884,7 +942,7 @@ p {
   font-size: 16px;
   font-weight: bold;
   color: white;
-  background-color: #666;           /* fallback color */
+  background-color: #666;
 }
 
 .send-alert-btn:disabled {
@@ -907,4 +965,137 @@ p {
   background-color: #f8d7da;
   border: 1px solid red;
   color: black;
+}
+
+.fire-danger-low {
+  color: green;
+}
+
+.fire-danger-moderate {
+  color: blue;
+}
+
+.fire-danger-high {
+  color: yellow;
+}
+
+.fire-danger-very-high {
+  color: orange;
+}
+
+.fire-danger-extreme {
+  color: red;
+}
+
+a h2 {
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.frontend-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #ffffff;
+  color: #000;
+  font-size: 14px;
+  width: fit-content;
+}
+
+.frontend-table th {
+  background-color: #2f4f2f;
+  color: #ffffff;
+  padding: 8px;
+  border: 1px solid #ccc;
+  text-align: center;
+}
+
+.frontend-table td {
+  padding: 6px;
+  border: 1px solid #ccc;
+  text-align: center;
+  
+}
+
+.frontend-table tbody tr:nth-child(odd) {
+  background-color: #ffffff; /* white */
+}
+
+.frontend-table tbody tr:nth-child(even) {
+  background-color: #e6f4ea;
+}
+
+.frontend-table tbody tr:hover {
+  background-color: #cde8d5;
+}
+
+.frontend-table td:first-child {
+  font-weight: bold;
+  background-color: #f5f5f5;
+}
+
+details {
+  padding: 5px;
+}
+
+summary {
+  display: inline-block;
+  width: fit-content;
+
+  font-weight: 700;
+  font-size: 16px;
+  color: #1f3b1f;
+
+  padding: 10px 14px;
+  background: #e6f4ea;
+
+  border-left: 4px solid #2f6f3a;
+  border-radius: 6px;
+
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+
+.learn-more-file {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 32px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  line-height: 1.6;
+}
+
+.doc-section {
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid #e6e6e6;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.danger-card {
+  background: #2f4f2f;
+  border-radius: 10px;
+  padding: 15px;
+  max-width: 400px;
+  color: white;
+}
+
+.danger-level {
+  border-radius: 14px;
+  padding: 20px;
+  text-align: center;
+  transition: transform 0.2s ease;
+  background: #333333;
+}
+
+.danger-level:hover {
+  transform: scale(1.02);
+}
+
+.card-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
 }

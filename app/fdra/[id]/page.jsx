@@ -1,12 +1,10 @@
 'use client'
 
-//DON'T USE STATION RECORD
-//NFDRRECORDS AND WEATHER DATA RECORDS
-
 import { useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { LineChart } from '@mui/x-charts/LineChart';
+import Link from "next/link";
 
 export default function FdraPage() {
   const pathname = usePathname()
@@ -22,11 +20,75 @@ export default function FdraPage() {
   // Toggle this: set to a string like '2026-03-01' to use hardcoded, or null to use today
   const hardcodedDate = null
 
+  //Used for past sprint, might need to keep to show more data
+  const numericKeys = ['BI', 'ERC', 'OneHourFM', 'TenHourFM', 'HundredHourFM', 'ThousandHourFM', 'KBDI', 'SC', 'IC']
+
+  const calculateAverages = (records) => {
+    const result = {}
+
+    numericKeys.forEach(key => {
+      const valid = records.filter(r => r[key] != null)
+
+      result[key] = valid.length
+        ? Number(
+            (valid.reduce((sum, r) => sum + Number(r[key]), 0) / valid.length).toFixed(2)
+          )
+        : null
+    })
+
+    return result
+  }
+
   const formatLocalDate = (date) => {
     const yr = date.getFullYear()
     const mo = String(date.getMonth() + 1).padStart(2, '0')
     const da = String(date.getDate()).padStart(2, '0')
     return `${yr}-${mo}-${da}`
+  }
+
+  //Convert degrees to compass directions
+  const getWindDirection = (deg) => {
+    if (deg == null) return null
+
+    const directions = ['N','NE','E','SE','S','SW','W','NW']
+    const index = Math.round(deg / 45) % 8
+
+    return directions[index]
+  }
+
+  //Calculate weather averages
+  const calculateWeatherAverages = (records) => {
+    if (!records?.length) return {}
+
+    const avg = (key) => {
+      const valid = records.filter(r => r[key] != null)
+      return valid.length
+        ? Number((valid.reduce((s, r) => s + Number(r[key]), 0) / valid.length).toFixed(2))
+        : null
+    }
+
+    //Getting most common Wind Direction
+    const mostCommonDir = (() => {
+      const dirs = records
+        .map(r => getWindDirection(r.Gust_Direction))
+        .filter(Boolean)
+
+      if (!dirs.length) return null
+
+      const counts = {}
+      dirs.forEach(d => counts[d] = (counts[d] || 0) + 1)
+
+      return Object.entries(counts).sort((a,b) => b[1] - a[1])[0][0]
+    })()
+
+    return {
+      WindSpeed: avg('Wind_Speed_Max'),
+      WindDir: mostCommonDir,
+      Rain: avg('Precipitation24hr'),
+      MaxTemp: avg('Temp_Max'),
+      MinRH: avg('Relative_Humidity_Min'),
+      MaxRH: avg('Relative_Humidity_Max')
+    }
   }
 
   useEffect(() => {
@@ -36,16 +98,16 @@ export default function FdraPage() {
       const now = new Date()
       const currentYear = now.getFullYear()
 
-      // 1. Pull FDRA data
+      //Pull FDRA data
       const { data: fdra, error: fdraError } = await supabase
         .from('FDRA')
-        .select('FDRAname, AVG_BI, AVG_ERC, DispatchArea(DispatchName)')
+        .select('FDRAname, AVG_BI, AVG_ERC, DispatchArea(DispatchName), Danger_Level, ERC_Percentile, BI_Percentile, ERC_90th, BI_90th')
         .eq('FDRA_ID', id)
         .single()
 
       if (fdraError) return console.error(fdraError)
 
-      // 2. Pull station IDs
+      //Pull station IDs
       const { data: stationLinks, error: linkError } = await supabase
         .from('Station_FDRA_Combinations')
         .select('Station_ID')
@@ -60,7 +122,7 @@ export default function FdraPage() {
         return
       }
 
-      // 3. Pull stations
+      //Pull stations
       const { data: stations, error: stationError } = await supabase
         .from('Stations')
         .select('ID, Station_Name')
@@ -68,36 +130,57 @@ export default function FdraPage() {
 
       if (stationError) return console.error(stationError)
 
-      // 4. Pull NFDRRecords (CURRENT YEAR + NEXT 6 DAYS ✅)
+      //Pull NFDRRecords (CURRENT YEAR + NEXT 6 DAYS)
       const todayStr = formatLocalDate(now)
 
       const futureDate = new Date()
       futureDate.setDate(now.getDate() + 6)
       const futureStr = formatLocalDate(futureDate)
 
-      // ---------- CURRENT YEAR + FORECAST ----------
+      //Pulling current year with forecast
       const { data: nfdrRecords, error: nfdrError } = await supabase
         .from('NFDRRecords')
         .select(`
           Station_ID, Observation_Time,
-          ERC, BI
+          ERC, BI,
+          OneHourFM, TenHourFM, HundredHourFM, ThousandHourFM,
+          IC, KBDI, SC
         `)
         .in('Station_ID', stationIds)
         .gte('Observation_Time', `${currentYear}-01-01`)
         .lte('Observation_Time', futureStr)
 
-      // ---------- 2018 ONLY ----------
+      //Pulling 2018
       const { data: nfdrRecords2018, error: nfdrError2018 } = await supabase
         .from('NFDRRecords')
         .select(`
           Station_ID, Observation_Time,
-          ERC, BI
+          ERC, BI,
+          OneHourFM, TenHourFM, HundredHourFM, ThousandHourFM,
+          IC, KBDI, SC
         `)
         .in('Station_ID', stationIds)
         .gte('Observation_Time', '2018-01-01')
         .lte('Observation_Time', '2018-12-31')
 
-      // ---------- DEDUPE CURRENT ----------
+      //Pulling Weather Data
+      const { data: weatherRecords, error: weatherError } = await supabase
+        .from('WeatherDataRecords')
+        .select(`
+          Station_ID, Observation_Time,
+          Temp_Min, Temp_Max,
+          Relative_Humidity_Min, Relative_Humidity_Max,
+          Wind_Speed_Max,
+          Gust_Direction,
+          Precipitation24hr
+        `)
+        .in('Station_ID', stationIds)
+        .gte('Observation_Time', `${currentYear}-01-01`)
+        .lte('Observation_Time', futureStr)
+
+      if (weatherError) return console.error(weatherError)
+
+      //Deduping current year
       const uniqueMap = new Map()
       nfdrRecords.forEach(r => {
         const date = r.Observation_Time.slice(0, 10)
@@ -112,7 +195,7 @@ export default function FdraPage() {
 
       const dedupedRecords = Array.from(uniqueMap.values())
 
-      // ---------- DEDUPE 2018 ----------
+      //Deduping 2018
       const uniqueMap2018 = new Map()
       nfdrRecords2018.forEach(r => {
         const date = r.Observation_Time.slice(0, 10)
@@ -127,7 +210,7 @@ export default function FdraPage() {
 
       const dedupedRecords2018 = Array.from(uniqueMap2018.values())
 
-      // ---------- DATE SETUP ----------
+      //Date Setup
       const latestDate = dedupedRecords?.length
         ? new Date(Math.max(...dedupedRecords.map(r => new Date(r.Observation_Time))))
         : now
@@ -144,7 +227,7 @@ export default function FdraPage() {
         new Set([activeDateStr, ...next6])
       )
 
-      // GROUP CURRENT DATES
+      //Grouping Current Dates
       const recordsByDate = {}
       dedupedRecords.forEach(r => {
         const date = r.Observation_Time.slice(0, 10)
@@ -152,7 +235,7 @@ export default function FdraPage() {
         recordsByDate[date].push(r)
       })
 
-      // GROUP 2018 DATES
+      //Grouping 2018 Dates
       const recordsByDate2018 = {}
       dedupedRecords2018.forEach(r => {
         const date = r.Observation_Time.slice(0, 10)
@@ -160,18 +243,23 @@ export default function FdraPage() {
         recordsByDate2018[date].push(r)
       })
 
-      // TODAY
+      const weatherByDate = {}
+      weatherRecords.forEach(r => {
+        const date = r.Observation_Time.slice(0, 10)
+        if (!weatherByDate[date]) weatherByDate[date] = []
+        weatherByDate[date].push(r)
+      })
+
+      //Today
       const todayRecords = recordsByDate[activeDateStr] ?? []
+      const todayWeather = weatherByDate[activeDateStr] ?? []
 
-      const calculatedAvgBI = todayRecords.length
-        ? Number((todayRecords.reduce((s, r) => s + (r.BI ?? 0), 0) / todayRecords.length).toFixed(2))
-        : null
+      const todayAverages = {
+        ...calculateAverages(todayRecords),
+        ...calculateWeatherAverages(todayWeather)
+      }
 
-      const calculatedAvgERC = todayRecords.length
-        ? Number((todayRecords.reduce((s, r) => s + (r.ERC ?? 0), 0) / todayRecords.length).toFixed(2))
-        : null
-
-      // HISTORICAL (CURRENT YEAR ONLY)
+      //Historical (CURRENT YEAR ONLY)
       const histDates = []
       let d = new Date(currentYear, 0, 1)
 
@@ -184,11 +272,14 @@ export default function FdraPage() {
         const recs = recordsByDate[date]
         if (!recs?.length) return null
 
-        const avg = recs.reduce((s, r) => s + (r.ERC ?? 0), 0) / recs.length
+        const valid = recs.filter(r => r.ERC != null)
+        if (!valid.length) return null
+
+        const avg = valid.reduce((s, r) => s + r.ERC, 0) / valid.length
         return Number(avg.toFixed(2))
       })
 
-      // HISTORICAL (2018)
+      //Historical (2018)
       const hist2018Dates = []
       let d2018 = new Date(2018, 0, 1)
 
@@ -201,7 +292,10 @@ export default function FdraPage() {
         const recs = recordsByDate2018[date]
         if (!recs?.length) return null
 
-        const avg = recs.reduce((s, r) => s + (r.ERC ?? 0), 0) / recs.length
+        const valid = recs.filter(r => r.ERC != null)
+        if (!valid.length) return null
+
+        const avg = valid.reduce((s, r) => s + r.ERC, 0) / valid.length
         return Number(avg.toFixed(2))
       })
 
@@ -213,30 +307,43 @@ export default function FdraPage() {
         return index !== -1 ? avgERC2018[index] : null
       })
 
-      // MERGE
+      //Merge (NFDR + WEATHER)
       const combinedRecords = []
 
       stations.forEach(station => {
         allDatesCombined.forEach(date => {
+
           const recs = (recordsByDate[date] ?? []).filter(
             r => r.Station_ID === station.ID
           )
 
+          const weatherForStation = (weatherByDate[date] ?? []).filter(
+            w => w.Station_ID === station.ID
+          )
+
+          const weatherAvg = calculateWeatherAverages(weatherForStation)
+
           if (recs.length) {
             recs.forEach(r =>
-              combinedRecords.push({ ...station, ...r, FDRA_ID: id })
+              combinedRecords.push({
+                ...station,
+                ...r,
+                ...weatherAvg,
+                FDRA_ID: id
+              })
             )
           } else {
             combinedRecords.push({
               ...station,
               Observation_Time: date,
+              ...weatherAvg,
               FDRA_ID: id
             })
           }
         })
       })
 
-      // SET STATE
+      //Set state
       setDailyAvgERC(avgERC)
       setHistoricalDates(histDates)
       setDates2018(hist2018Dates)
@@ -247,25 +354,25 @@ export default function FdraPage() {
       setData({
         ...fdra,
         StationRecord: combinedRecords,
-        calculatedAvgBI,
-        calculatedAvgERC
+        todayAverages
       })
     }
 
     fetchData()
   }, [id])
 
+  //Loading
   if (!data) return <p>Loading...</p>
   const todayStr = formatLocalDate(new Date())
 
-  //Used for past sprint, might need to keep to show more data
-  //const numericKeys = ['BI', 'ERC', 'OneHourFM', 'TenHourFM', 'HundredHourFM', 'ThousandHourFM', 'KBDI', 'SC', 'IC']
+  //90th Percentile lines
+  const erc90 = data?.ERC_90th ?? null
+  const bi90 = data?.BI_90th ?? null
 
-  //Hardcoded for now, will calculate in the future
-  const percentile90 = historicalDates.map(() => 50)
-
+  //Getting correct dates
   const chartDates = [...historicalDates, ...allDates]
 
+  //Getting forecast info
   const forecastSeriesData = chartDates.map(date => {
     if (date < todayStr) return null
 
@@ -279,110 +386,302 @@ export default function FdraPage() {
     return Number(avg.toFixed(2))
   })
 
+
   return (
     <main>
-      <h2 style={{ color: 'white' }}>
-        Dispatch Area: {data?.DispatchArea?.DispatchName}
-      </h2>
+      
+      <div className="danger-card">
+        <h2 style={{ color: 'white' }}>
+          Dispatch Area: {data?.DispatchArea?.DispatchName}
+        </h2>
 
-      <h2 style={{ color: 'white' }}>
-        FDRA: {data?.FDRAname}
-      </h2>
+        <h2 style={{ color: 'white' }}>
+          FDRA: {data?.FDRAname}
+        </h2>
 
-      <LineChart 
-        height={400} 
-        grid={{ horizontal: true }} 
-        xAxis={[{ scaleType: 'point', data: chartDates, tickInterval: chartDates.filter(date => date.endsWith('-01')), valueFormatter: (value) => new Date(value + 'T00:00:00').toLocaleString('default', { month: 'short' }), }]} 
-        series={[ 
-          {
-            label: `${new Date().getFullYear()} Observed Avg. ERC`,
-            data: chartDates.map((date, i) => {
-              if (date > todayStr) return null
-              return dailyAvgERC[i] ?? null
-            }),
-            showMark: false,
-            color: '#0072B2',
-            valueFormatter: (value, context) => {
-                if(value === null) return ''
-              
-                const date = chartDates[context.dataIndex]
-                return `${date}: ${value}`
-            }
-          }, 
-            {            
-              label: 'Forecast ERC',
-              data: forecastSeriesData,
-              showMark: false,
-              color: '#E69F00',
-              valueFormatter: (value, context) => {
-                if(value === null) return ''
-              
-                const date = chartDates[context.dataIndex]
-                return `${date}: ${value}`
+        <Link href="/learn-more/overview" className="card-link">
+          <h2 className="danger-level">
+            Fire Danger Level:{" "}
+            <span
+              className={
+                data?.Danger_Level === "Very High"
+                  ? "fire-danger-very-high"
+                  : `fire-danger-${data?.Danger_Level?.toLowerCase()}`
               }
-            }, 
-            { label: '90th Percentile ERC', 
-              data: [...percentile90, ...Array(next6Days.length).fill(null)], 
-              showMark: false, 
-              color: '#CC79A7', 
-              valueFormatter: (value, context) => { 
-                const date = chartDates[context.dataIndex]
-                return `${date}: ${value}`
-              }
-            },
+            >
+              {data?.Danger_Level}
+            </span>
+          </h2>
+        </Link>
+
+      </div>
+      
+
+      <br></br>
+
+      <details>
+          <summary>In-Depth Values</summary>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: '10px',
+            maxWidth: '900px',
+            marginBottom: '20px',
+            color: 'black'
+          }}>
+            {[
+              { label: 'ERC %', value: data?.ERC_Percentile },
+              { label: 'BI %', value: data?.BI_Percentile },
+              { label: 'Winds', value: data?.todayAverages?.WindSpeed ?? 'N/A' },
+              { label: 'Wind Dir', value: data?.todayAverages?.WindDir ?? 'N/A' },
+              { label: '24hr Rain', value: data?.todayAverages?.Rain ?? 'N/A' },
+              { label: 'Max Temp', value: data?.todayAverages?.MaxTemp ?? 'N/A' },
+              { label: 'Min RH', value: data?.todayAverages?.MinRH ?? 'N/A' },
+              { label: 'Max RH', value: data?.todayAverages?.MaxRH ?? 'N/A' },
+            ].map((item, i) => (
+              <div key={i} style={{
+                background: '#2f4f2f',
+                padding: '8px',
+                textAlign: 'center',
+                fontWeight: 'bold'
+              }}>
+                <div>{item.label}</div>
+                <div style={{ background: 'white', marginTop: '5px', padding: '5px' }}>
+                  {item.value ?? 'N/A'}
+                </div>
+              </div>
+            ))}
+          </div>
+      </details>
+
+
+      <details>
+        <summary>Graph</summary>
+        <LineChart 
+          height={400} 
+          grid={{ horizontal: true }} 
+          xAxis={[{ scaleType: 'point', data: chartDates, tickInterval: chartDates.filter(date => date.endsWith('-01')), valueFormatter: (value) => new Date(value + 'T00:00:00').toLocaleString('default', { month: 'short' }), }]} 
+          series={[ 
             {
-              label: '2018 Avg. ERC',
+              label: `${new Date().getFullYear()} Observed Avg. ERC`,
               data: chartDates.map((date, i) => {
-                // Only plot for historical portion
-                if (i >= historicalDates.length) return null
-                return dailyAvgERC2018[i] ?? null
+                if (date > todayStr) return null
+                return dailyAvgERC[i] ?? null
               }),
               showMark: false,
-              color: '#009E73',
+              color: '#0072B2',
               valueFormatter: (value, context) => {
-                if (value === null) return ''
-
-                const date = chartDates[context.dataIndex]
-                return `${date}: ${value}`
+                  if(value === null) return ''
+                
+                  const date = chartDates[context.dataIndex]
+                  return `${date}: ${value}`
               }
-            },
-        ]} 
-        slotProps={{ tooltip: { trigger: 'axis', }, }} 
-        
-        sx={{ 
-              backgroundColor: '#333333',
-              '& .MuiChartsAxis-line': { stroke: '#ffffff !important' }, 
-              '& .MuiChartsAxis-tick': { stroke: '#ffffff' }, 
-              '& .MuiChartsAxis-tickLabel': { fill: '#ffffff !important', fontWeight: 600 }, 
-              '& .MuiChartsAxis-label': { fill: '#ffffff !important' }, 
-              '& .MuiChartsLegend-label': { fill: '#ffffff !important', color: '#ffffff !important' }, 
-              '& .MuiChartsGrid-line': { stroke: 'rgba(255,255,255,0.2)' }, 
-              }} 
+            }, 
+              {            
+                label: 'Forecast ERC',
+                data: forecastSeriesData,
+                showMark: false,
+                color: '#E69F00',
+                valueFormatter: (value, context) => {
+                  if(value === null) return ''
+                
+                  const date = chartDates[context.dataIndex]
+                  return `${date}: ${value}`
+                }
+              }, 
+              { 
+                label: '90th Percentile ERC', 
+                data: chartDates.map(() => erc90), 
+                showMark: false, 
+                color: '#CC79A7', 
+              },
+              { 
+                label: '90th Percentile BI', 
+                data: chartDates.map(() => bi90), 
+                showMark: false, 
+                color: '#D55E00', 
+              },
+              {
+                label: '2018 Avg. ERC',
+                data: chartDates.map((date, i) => {
+                  // Only plot for historical portion
+                  if (i >= historicalDates.length) return null
+                  return dailyAvgERC2018[i] ?? null
+                }),
+                showMark: false,
+                color: '#009E73',
+                valueFormatter: (value, context) => {
+                  if (value === null) return ''
+
+                  const date = chartDates[context.dataIndex]
+                  return `${date}: ${value}`
+                }
+              },
+          ]} 
+          slotProps={{ tooltip: { trigger: 'axis', }, }} 
+          
+          sx={{ 
+                backgroundColor: '#333333',
+                '& .MuiChartsAxis-line': { stroke: '#ffffff !important' }, 
+                '& .MuiChartsAxis-tick': { stroke: '#ffffff' }, 
+                '& .MuiChartsAxis-tickLabel': { fill: '#ffffff !important', fontWeight: 600 }, 
+                '& .MuiChartsAxis-label': { fill: '#ffffff !important' }, 
+                '& .MuiChartsLegend-label': { fill: '#ffffff !important', color: '#ffffff !important' }, 
+                '& .MuiChartsGrid-line': { stroke: 'rgba(255,255,255,0.2)' },
+                }} 
         />
+      </details>
 
-      {allDates.map(date => {
-        const records = data.StationRecord.filter(
-          r => r.FDRA_ID === id &&
+      <details>
+        <summary>{data?.FDRAname} Extended Forecast</summary>
+        <table className = "frontend-table">
+          <thead>
+            <tr>
+              <th></th>
+              {allDates.map(date => (
+                <th key={date}>{date}</th>
+              ))}
+            </tr>
+          </thead>
+
+          <tbody>
+            {[
+              {
+                label: 'Average ERC',
+                key: 'ERC'
+              },
+              {
+                label: 'Average BI',
+                key: 'BI'
+              },
+              {
+                label: '100hr Fuels',
+                key: 'HundredHourFM'
+              },
+              {
+                label: 'Max RH',
+                key: 'MaxRH'
+              },
+              {
+                label: 'Winds',
+                key: 'WindSpeed'
+              },
+              {
+                label: 'Temperature',
+                key: 'MaxTemp'
+              },
+              {
+                label: 'Relative Humidity',
+                key: 'MinRH'
+              },
+              {
+                label: 'Wind Direction',
+                key: 'WindDir'
+              },
+              {
+                label: 'Precipitation',
+                key: 'Rain'
+              },
+
+            ].map(row => (
+              <tr key={row.label}>
+                <td style={{ fontWeight: 'bold' }}>{row.label}</td>
+
+                {allDates.map(date => {
+                  const recs = data.StationRecord.filter(
+                    r => r.Observation_Time.slice(0, 10) === date
+                  )
+
+                  const valid = recs.filter(r => r[row.key] != null)
+
+                  // Special handling for Wind Direction (mode instead of average)
+                  if (row.key === 'WindDir') {
+                    if (!valid.length) return <td key={date}>N/A</td>
+
+                    const counts = {}
+                    valid.forEach(r => {
+                      const dir = r[row.key]
+                      counts[dir] = (counts[dir] || 0) + 1
+                    })
+
+                    const mostCommon = Object.entries(counts)
+                      .sort((a, b) => b[1] - a[1])[0][0]
+
+                    return <td key={date}>{mostCommon}</td>
+                  }
+
+                  // Default numeric averaging
+                  const avg = valid.length
+                    ? (valid.reduce((s, r) => s + Number(r[row.key]), 0) / valid.length).toFixed(1)
+                    : 'N/A'
+
+                  return <td key={date}>{avg}</td>
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </details>
+
+      <details>
+        <summary>Weather Station Data</summary>
+        {allDates.map(date => {
+          const records = data.StationRecord.filter(
+            r =>
+              r.FDRA_ID === id &&
               r.Observation_Time.slice(0, 10) === date
-        )
+          )
 
-        return (
-          <section key={date}>
-            <h2>Station Records for {date}</h2>
-            {records.length === 0 ? (
-              <p>No records for this date.</p>
-            ) : (
-              <ul>
-                {records.map((r, idx) => (
-                  <li key={idx}>
-                    {r.Station_Name ?? `Station ${r.Station_ID}`} — ERC: {r.ERC ?? 'N/A'}, BI: {r.BI ?? 'N/A'}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
-        )
-      })}
+          return (
+            <section key={date} style={{ marginBottom: '25px' }}>
+              <h3>{date}</h3>
+
+              <table className = "frontend-table">
+                <thead>
+                  <tr>
+                    <th>Station</th>
+                    <th>ERC</th>
+                    <th>BI</th>
+                    <th>100hr</th>
+                    <th>Temp</th>
+                    <th>Min RH</th>
+                    <th>Wind</th>
+                    <th>Wind Dir</th>
+                    <th>Rain</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {records.length === 0 ? (
+                    <tr>
+                      <td colSpan="9" style={{ textAlign: 'center' }}>
+                        No records for this date.
+                      </td>
+                    </tr>
+                  ) : (
+                    records.map((r, idx) => (
+                      <tr key={idx}>
+                        <td style={{ fontWeight: 'bold' }}>
+                          {r.Station_Name ?? `Station ${r.Station_ID}`}
+                        </td>
+
+                        <td>{r.ERC ?? 'N/A'}</td>
+                        <td>{r.BI ?? 'N/A'}</td>
+                        <td>{r.HundredHourFM ?? 'N/A'}</td>
+                        <td>{r.MaxTemp ?? 'N/A'}</td>
+                        <td>{r.MinRH ?? 'N/A'}</td>
+                        <td>{r.WindSpeed ?? 'N/A'}</td>
+                        <td>{r.WindDir ?? 'N/A'}</td>
+                        <td>{r.Rain ?? 'N/A'}</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </section>
+          )
+        })}
+      </details>
     </main>
   )
 }
