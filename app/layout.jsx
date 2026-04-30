@@ -21,7 +21,9 @@ export default async function RootLayout({ children }) {
         
         <nav className="nav-Bar-Top">
           <div className="logo-navbar"> 
-            <img src="/images/bwa_logo_150x150px.webp" width="60" height="60"/>
+            <a href="/">
+              <img src="/images/bwa_logo_150x150px.webp" width="60" height="60"/>
+            </a>  
           </div>
           
           <Link href="/"> Home</Link>

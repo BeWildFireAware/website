@@ -1,4 +1,5 @@
 // Test page for email functionality
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -12,7 +13,7 @@ export default function TestEmail() {
     const [email, setEmail] = useState('');
     const [subject, setSubject] = useState('Test Email');
     const [message, setMessage] = useState('');
-    //const [sendToAllVerified, setSendToAllVerified] = useState(false);
+    const [sendToAllVerified, setSendToAllVerified] = useState(false);
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState('');
     const [fdraDataList, setFdraDataList] = useState([]);
@@ -115,12 +116,12 @@ export default function TestEmail() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="delivered@resend.dev (Resend test email)"
-                        //disabled={sendToAllVerified}
+                        disabled={sendToAllVerified}
                     />
                 </div>
 
                 {/* NOT ENABLED DUE TO ONLY BEING ABLE TO SEND TO TEST EMAIL UNTIL DOMAIN IS ADDED */}
-                {/* <div>
+                <div>
                     <label>
                         <input
                             type="checkbox"
@@ -129,7 +130,7 @@ export default function TestEmail() {
                         />
                         Send to ALL verified users
                     </label>
-                </div> */}
+                </div>
 
                 {/* <div>
                     <label>Subject:</label>
@@ -157,11 +158,11 @@ export default function TestEmail() {
                     {loading ? 'Sending...' : 'Send Test Email'}
                 </button> */}
 
-                {/* {result && (
+                {result && (
                     <div>
                         {result}
                     </div>
-                )} */}
+                )}
                 <div >
                     <Link href="../admin">
                         ← Back to Admin Dashboard
