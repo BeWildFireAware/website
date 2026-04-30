@@ -25,6 +25,7 @@ export async function POST(request) {
     try {
         // sendToAllVerified can be used to send alerts to all verified users in the database,
         // or sendTo can be used to target specific email addresses.
+        
         const { sendTo, subject, html, /*sendToAllVerified */ } = await request.json();
 
         let recipients = sendTo || [];

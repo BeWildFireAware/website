@@ -158,11 +158,11 @@ export default function TestEmail() {
                     {loading ? 'Sending...' : 'Send Test Email'}
                 </button> */}
 
-                {result && (
+                {/* {result && (
                     <div>
                         {result}
                     </div>
-                )}
+                )} */}
                 <div >
                     <Link href="../admin">
                         ← Back to Admin Dashboard
