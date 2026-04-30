@@ -686,6 +686,7 @@ p {
   justify-content: space-between;
   text-decoration: none;
   color: inherit;
+  background: #ccc;
 }
 
 .fdra-info {
