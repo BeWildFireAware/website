@@ -227,6 +227,15 @@ p {
 }
 
 
+@media (max-width: 768px) {
+  .nav-Bar-Top {
+    padding: 10px;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+}
+
+
 .nav-links {
   display: flex;
   align-items: center;
