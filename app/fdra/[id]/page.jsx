@@ -17,13 +17,6 @@ export default function FdraPage() {
   const [allDates, setAllDates] = useState([])
   const [next6Days, setNext6Days] = useState([])
 
-  // Error states
-  const [errorMessage, setErrorMessage] = useState('')
-  const [isLoading, setIsLoading] = useState(true)
-  const [fdraError, setFdraError] = useState(null)
-  const [stationError, setStationError] = useState(null)
-  const [nfdrError, setNfdrError] = useState(null)
-
   // Toggle this: set to a string like '2026-03-01' to use hardcoded, or null to use today
   const hardcodedDate = null
 
@@ -100,13 +93,10 @@ export default function FdraPage() {
 
   useEffect(() => {
     if (!id) return
+
     const fetchData = async () => {
-      setIsLoading(true)
-      setErrorMessage('')
-      
-      try {
-        const now = new Date()
-        const currentYear = now.getFullYear()
+      const now = new Date()
+      const currentYear = now.getFullYear()
 
       //Pull FDRA data
       const { data: fdra, error: fdraError } = await supabase
@@ -201,12 +191,9 @@ export default function FdraPage() {
         if (!existing || new Date(r.Observation_Time) > new Date(existing.Observation_Time)) {
           uniqueMap.set(key, r)
         }
+      })
 
-        // 2. Pull station IDs
-        const { data: stationLinks, error: linkError } = await supabase
-          .from('Station_FDRA_Combinations')
-          .select('Station_ID')
-          .eq('FDRA_ID', id)
+      const dedupedRecords = Array.from(uniqueMap.values())
 
       //Deduping 2018
       const uniqueMap2018 = new Map()
@@ -219,29 +206,26 @@ export default function FdraPage() {
         if (!existing || new Date(r.Observation_Time) > new Date(existing.Observation_Time)) {
           uniqueMap2018.set(key, r)
         }
+      })
 
-        const stationIds = stationLinks.map(s => s.Station_ID)
+      const dedupedRecords2018 = Array.from(uniqueMap2018.values())
 
       //Date Setup
       const latestDate = dedupedRecords?.length
         ? new Date(Math.max(...dedupedRecords.map(r => new Date(r.Observation_Time))))
         : now
 
-        // 3. Pull stations
-        const { data: stations, error: stationError } = await supabase
-          .from('Stations')
-          .select('ID, Station_Name')
-          .in('ID', stationIds)
+      const activeDateStr = hardcodedDate ?? todayStr
 
-        if (stationError){
-          console.error('Station Data Error:', stationError);
-          setErrorMessage('Unable to load station data for this FDRA. Please refresh the page or contact support if the issue persists.');
-          setIsLoading(false);
-          return;
-        } 
+      const next6 = Array.from({ length: 6 }).map((_, i) => {
+        const d = new Date(activeDateStr)
+        d.setDate(d.getDate() + i + 1)
+        return formatLocalDate(d)
+      })
 
-        // 4. Pull NFDRRecords (CURRENT YEAR + NEXT 6 DAYS ✅)
-        const todayStr = formatLocalDate(now)
+      const allDatesCombined = Array.from(
+        new Set([activeDateStr, ...next6])
+      )
 
       //Grouping Current Dates
       const recordsByDate = {}
@@ -357,6 +341,7 @@ export default function FdraPage() {
             })
           }
         })
+      })
 
       //Set state
       setDailyAvgERC(avgERC)
