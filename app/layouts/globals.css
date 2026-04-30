@@ -212,20 +212,20 @@ p {
   display: flex;
   justify-content: center;
   gap: 30px;
-  background-color: #0B3D12;
+  background-color: #347338;
   padding: 10px;
 }
 
 .nav-Bar-Top {
-  padding: 20px;
-  background-color: #0B3D12;
   display: flex;
+  justify-content:right;
+  gap: 10px;
+  padding: 25px;
+  background-color: #347338;
+  position: relative;
+  
 }
 
-.logo-navbar {
-  display: flex;
-  align-items: center;
-}
 
 .nav-links {
   display: flex;
@@ -234,21 +234,29 @@ p {
   gap: 30px;
 }
 
-.nav-links a,
-.nav-links button {
-  display: flex;
-  color: white;
+/* Base link styles */
+.nav-Bar-Top a,
+.nav-Bar-Bottom a {
+  color: #FFFFFF;
   text-decoration: none;
+  text-align: center;
 }
 
+/* Ensure links stay white */
 .nav-Bar-Top a:visited,
 .nav-Bar-Bottom a:visited,
 .nav-Bar-Top a:link,
-.nav-Bar-Bottom a:link
-{
-  color: #FFFFFF !important;
-  text-decoration: none;
+.nav-Bar-Bottom a:link {
+  color: #FFFFFF;
 }
+
+/* Active (clicked) state */
+.nav-Bar-Top a:active,
+.nav-Bar-Bottom a:active {
+  color: #FF6600;
+}
+
+
 
 .contact-info {
   text-align: center;
@@ -256,6 +264,12 @@ p {
   background-color: #DA9365;
   color: black;
   margin: 0;
+}
+
+
+.logo-navbar {
+  display: flex;
+  align-items: center;
 }
 
 /* Homepage */
@@ -283,14 +297,11 @@ p {
 .dropdown-trigger {
   background: none;
   border: none;
-  color: #FFFFFF !important;
+  color: #FFFFFF;
   font: inherit;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 6px;
-  height: 100%;
-  transition: background-color 0.2s;
   text-decoration: none !important;
 }
 
@@ -309,8 +320,8 @@ p {
 }
 
 .dropdown-arrow {
-  font-size: 0.7rem;
-  transition: transform 0.2s ease;
+  font-size: 13px;
+  transition: transform 0.2s;
   color: #FFFFFF;
 }
 
@@ -320,17 +331,14 @@ p {
 
 .dropdown-menu {
   position: absolute;
-  top: 105%;
   right: 0;
   background: #0B3D12;
   min-width: 260px;
   max-height: 70vh;
   overflow-y: auto;
-  border: 1px solid #1a4720;
   border-radius: 8px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 10px 10px black;
   z-index: 1000;
-  padding: 0.5rem 0;
 
   /* animation */
   animation: dropdownFade 0.15s ease-out;
@@ -511,6 +519,7 @@ p {
     font-size: 0.9rem;
   }
 }
+
 
 /* ================= EXTREME DANGER LIST CONTAINER ================= */
 .extreme-danger-container {
