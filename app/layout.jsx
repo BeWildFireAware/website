@@ -4,6 +4,7 @@ import "./layouts/globals.css";
 import Link from "next/link";
 import DropDownClient from "./components/dropdown_comp/DropDownClient";
 import { GetDropdownData } from "./components/dropdown_comp/GetDropdownData";
+import LearnMoreDropDown from "./components/dropdown_comp/LearnMoreDropDown"
 // import AuthNav from "./deprecated/authNav"
 import 'leaflet/dist/leaflet.css'; //for map comp 
 
@@ -20,17 +21,18 @@ export default async function RootLayout({ children }) {
       <body>
         
         <nav className="nav-Bar-Top">
-          <div className="logo-navbar"> 
-            <a href="/">
-              <img src="/images/bwa_logo_150x150px.webp" width="60" height="60"/>
-            </a>  
+          <div className="logo-navbar">
+            <img src="/images/bwa_logo_150x150px.webp" width="90px" height="90px" />
           </div>
-          
-          <Link href="/"> Home</Link>
-          <Link href="/about"> Who We Are</Link>
-          <Link href="/learn-more"> Learn More</Link>
-          <Link href="/map"> View Map</Link>
-          <DropDownClient dispatchData={data} />
+
+          <div className="nav-links">
+            <Link href="/">Home</Link>
+            <Link href="/about">About</Link>
+            <Link href="/map">View Map</Link>
+            <Link href="/resources">Resources</Link>
+            <LearnMoreDropDown>Learn More</LearnMoreDropDown>
+            <DropDownClient dispatchData={data} />
+          </div>
         </nav>
         
         <div className="page-container">
@@ -38,9 +40,9 @@ export default async function RootLayout({ children }) {
         </div>
         
         <nav className="nav-Bar-Bottom">
-          <Link href="/"> Home</Link>
-          <Link href="/about"> Who We Are</Link>
-          <Link href="/learn-more"> Learn More</Link>
+          <Link href="/">✪ Home</Link>
+          <Link href="/about">✪ About</Link>
+          <Link href="/map">✪ Map</Link>
         </nav>
        
           
