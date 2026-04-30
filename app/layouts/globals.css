@@ -231,6 +231,18 @@ p {
   .nav-Bar-Top {
     padding: 10px;
     gap: 10px;
+    flex-wrap: wrap; /* allows items to move to next line */
+  }
+  
+  .nav-links {
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+  }
+  
+  .nav-Bar-Bottom {
+    gap: 15px;
     flex-wrap: wrap;
   }
 }
