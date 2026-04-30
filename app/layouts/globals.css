@@ -217,7 +217,7 @@ p {
 }
 
 .nav-Bar-Top {
-  padding: 30px;
+  padding: 20px;
   background-color: #0B3D12;
   display: flex;
 }
@@ -256,13 +256,6 @@ p {
   background-color: #DA9365;
   color: black;
   margin: 0;
-}
-
-.logo-navbar {
-  position: absolute;
-  left: 15px;
-  top: 50%;
-  transform: translateY(-50%);
 }
 
 /* Homepage */
