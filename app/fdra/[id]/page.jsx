@@ -5,6 +5,9 @@ import { usePathname } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { LineChart } from '@mui/x-charts/LineChart';
 import Link from "next/link";
+import { getBreakpoints } from '@/app/actions/breakpointActions';
+
+const DANGER_LEVELS = ['Low', 'Moderate', 'High', 'Very High', 'Extreme'];
 
 export default function FdraPage() {
   const pathname = usePathname()
@@ -16,6 +19,8 @@ export default function FdraPage() {
   const [dates2018, setDates2018] = useState([])
   const [allDates, setAllDates] = useState([])
   const [next6Days, setNext6Days] = useState([])
+  const [breakpoints, setBreakpoints] = useState([])
+  const [useBi, setUseBi] = useState(false)
 
   // Toggle this: set to a string like '2026-03-01' to use hardcoded, or null to use today
   const hardcodedDate = null
@@ -56,6 +61,33 @@ export default function FdraPage() {
     return directions[index]
   }
 
+  //Determine fire danger level from ERC (and optionally BI) based on breakpoints
+  const getDangerLevel = (avgErc, avgBi = null) => {
+    if (avgErc == null || !breakpoints.length) return null
+
+    // Sort breakpoints by ERC threshold descending to find highest matching level
+    const sortedBps = [...breakpoints].sort((a, b) => b.Erc_Breakpoint - a.Erc_Breakpoint)
+
+    for (const bp of sortedBps) {
+      const ercMet = avgErc >= bp.Erc_Breakpoint
+
+      // If using BI, both conditions must be met
+      if (useBi && bp.Bi_Breakpoint != null) {
+        const biMet = avgBi != null && avgBi >= bp.Bi_Breakpoint
+        if (ercMet && biMet) {
+          return DANGER_LEVELS[bp.Danger_Level - 1]
+        }
+      } else {
+        // ERC only
+        if (ercMet) {
+          return DANGER_LEVELS[bp.Danger_Level - 1]
+        }
+      }
+    }
+
+    return DANGER_LEVELS[0] // Default to 'Low' if no breakpoint matched
+  }
+
   //Calculate weather averages
   const calculateWeatherAverages = (records) => {
     if (!records?.length) return {}
@@ -90,6 +122,21 @@ export default function FdraPage() {
       MaxRH: avg('Relative_Humidity_Max')
     }
   }
+
+  // Fetch breakpoints for this FDRA
+  useEffect(() => {
+    if (!id) return
+
+    const fetchBreakpointsData = async () => {
+      const result = await getBreakpoints(id)
+      if (result && Array.isArray(result.breakpoints)) {
+        setBreakpoints(result.breakpoints)
+        setUseBi(result.useBi || false)
+      }
+    }
+
+    fetchBreakpointsData()
+  }, [id])
 
   useEffect(() => {
     if (!id) return
@@ -545,6 +592,45 @@ export default function FdraPage() {
           </thead>
 
           <tbody>
+            {/* Fire Danger Level Row */}
+            <tr>
+              <td style={{ fontWeight: 'bold' }}>Fire Danger</td>
+              {allDates.map(date => {
+                const recs = data.StationRecord.filter(
+                  r => r.Observation_Time.slice(0, 10) === date
+                )
+
+                // Calculate average ERC for this date
+                const ercValid = recs.filter(r => r.ERC != null)
+                const avgErc = ercValid.length
+                  ? ercValid.reduce((s, r) => s + Number(r.ERC), 0) / ercValid.length
+                  : null
+
+                // Calculate average BI for this date (if using BI)
+                const biValid = recs.filter(r => r.BI != null)
+                const avgBi = biValid.length
+                  ? biValid.reduce((s, r) => s + Number(r.BI), 0) / biValid.length
+                  : null
+
+                const dangerLevel = getDangerLevel(avgErc, avgBi)
+
+                return (
+                  <td
+                    key={date}
+                    className={
+                      dangerLevel === 'Very High'
+                        ? 'fire-danger-very-high'
+                        : dangerLevel
+                          ? `fire-danger-${dangerLevel.toLowerCase()}`
+                          : ''
+                    }
+                  >
+                    {dangerLevel || 'N/A'}
+                  </td>
+                )
+              })}
+            </tr>
+
             {[
               {
                 label: 'Average ERC',
